@@ -2,31 +2,6 @@ __author__ = 'b8horpet'
 
 
 from NeuralNet.Common import *
-import math
-
-
-def LinearFilter(x: float) -> float:
-    return x
-
-
-def SlabFilter(x: float) -> float:
-    if x > 0.0:
-        return 1.0
-    else:
-        return -1.0
-
-
-def LinearSlabFilter(x: float) -> float:
-    if x > 1.0:
-        return 1.0
-    elif x < -1.0:
-        return -1.0
-    else:
-        return x
-
-#sigmoids -- easy to differentiate
-def TangentHyperbolic(x: float) -> float :
-    return math.tanh(x)
 
 
 class Neuron(NeuralObjectInterface):
@@ -34,7 +9,7 @@ class Neuron(NeuralObjectInterface):
         global ConstantOne
         self.Inputs = []
         self.Output = 0.0
-        self.TransferFilter = LinearFilter
+        self.TransferFilter = LinearFilter()
 #        self.TransferFilter = LinearSlabFilter
         Synapsis(ConstantOne, self, 0.0)
 
@@ -49,27 +24,11 @@ class Neuron(NeuralObjectInterface):
         self.Output=self.TransferFilter(_sum)
 
 
-def ConstZero() -> None:
-    return 0
-
-
-def ConstValueHolder(x):
-    def HolderFunction():
-        return x
-    return HolderFunction
-
-
-def ValueHolder(x):
-    def HolderFunction():
-        return x[0]
-    return HolderFunction
-
-
 class InputNeuron(Neuron):
     def __init__(self):
         self.Output=0.0
         self.Inputs=[0.0]
-        self.GetInput=ValueHolder(self.Inputs)
+        self.GetInput=ListValueHolder(self.Inputs)
 
     def Activate(self):
         self.Inputs[0]=self.GetInput()

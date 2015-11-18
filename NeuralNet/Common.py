@@ -1,17 +1,12 @@
 __author__ = 'b8horpet'
 
 
-class PureVirtualCallException(Exception):
-    pass
+from NeuralNet.Functions import *
 
 
 class NeuralObjectInterface:
     def __init__(self):
         raise PureVirtualCallException
 
-    def __del__(self):
-        raise PureVirtualCallException
-
     def Activate(self):
         raise PureVirtualCallException
-

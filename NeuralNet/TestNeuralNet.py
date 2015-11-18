@@ -32,6 +32,14 @@ class TestNeuron(unittest.TestCase):
         b.Activate()
         self.assertEqual(b.OutputLayer.Neurons[0].Output,x)
 
+    def test_Functions(self):
+        self.assertGreater(len(Derivatives),0)
+        fxsqrd=Polinomial(2)
+        self.assertTrue(fxsqrd in Derivatives)
+        fxm2=Polinomial(1,2.0)
+        self.assertFalse(fxm2 in Derivatives)
+
+
 if __name__ == '__main__':
     unittest.main()
 
