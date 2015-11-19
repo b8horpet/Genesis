@@ -67,13 +67,13 @@ class TangentHyperbolic(FunctionObjectInterface):
         return math.tanh(args[0])
 
     def Differentiate(self):
-        class TanhXOneminusTanh(FunctionObjectInterface):
+        class OneminusTanhSquared(FunctionObjectInterface):
             def __init__(self):
                 pass
 
             def __call__(self, *args, **kwargs):
-                return 1-(math.tanh(args[0])**2)
-        return TanhXOneminusTanh()
+                return 1.0-(math.tanh(args[0])**2)
+        return OneminusTanhSquared()
 
 
 class ConstZero(FunctionObjectInterface):
