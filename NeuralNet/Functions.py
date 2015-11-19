@@ -4,9 +4,6 @@ __author__ = 'b8horpet'
 import math
 
 
-Derivatives = {}
-
-
 class PureVirtualCallException(Exception):
     pass
 
@@ -18,16 +15,25 @@ class FunctionObjectInterface:
     def __call__(self, *args, **kwargs):
         raise PureVirtualCallException
 
+    def __eq__(self, other):
+        return isinstance(other,type(self))
 
-class LinearFilter:
+    def Differentiate(self):
+        return None
+
+
+class LinearFilter(FunctionObjectInterface):
     def __init__(self):
         pass
 
     def __call__(self, *args, **kwargs):
         return args[0]
 
+    def Differentiate(self):
+        return ConstOne()
 
-class SlabFilter:
+
+class SlabFilter(FunctionObjectInterface):
     def __init__(self):
         pass
 
@@ -38,7 +44,7 @@ class SlabFilter:
             return -1.0
 
 
-class LinearSlabFilter:
+class LinearSlabFilter(FunctionObjectInterface):
     def __init__(self):
         pass
 
@@ -53,47 +59,68 @@ class LinearSlabFilter:
 
 
 #sigmoids -- easy to differentiate
-class TangentHyperbolic:
+class TangentHyperbolic(FunctionObjectInterface):
     def __init__(self):
         pass
 
     def __call__(self, *args, **kwargs):
         return math.tanh(args[0])
 
+    def Differentiate(self):
+        class TanhXOneminusTanh(FunctionObjectInterface):
+            def __init__(self):
+                pass
 
-class ConstZero:
+            def __call__(self, *args, **kwargs):
+                return 1-(math.tanh(args[0])**2)
+        return TanhXOneminusTanh()
+
+
+class ConstZero(FunctionObjectInterface):
     def __init__(self):
         pass
 
     def __call__(self, *args, **kwargs):
         return 0.0
 
+    def Differentiate(self):
+        return ConstZero()
 
-class ConstOne:
+
+class ConstOne(FunctionObjectInterface):
     def __init__(self):
         pass
 
     def __call__(self, *args, **kwargs):
         return 1.0
 
+    def Differentiate(self):
+        return ConstZero()
 
-class ConstValueHolder:
+
+class ConstValueHolder(FunctionObjectInterface):
     def __init__(self, v):
         self.value = v
 
     def __call__(self, *args, **kwargs):
         return self.value
 
+    def Differentiate(self):
+        return ConstZero()
 
-class ListValueHolder:
+
+class ListValueHolder(FunctionObjectInterface):
     def __init__(self, l):
         self.value = l
 
     def __call__(self, *args, **kwargs):
         return self.value[0]
 
+    def Differentiate(self):
+        return ConstZero()
 
-class Polinomial:
+
+class Polinomial(FunctionObjectInterface):
     def __init__(self,n: int, a: float = 1.0):
         self.n = n
         self.a = a
@@ -108,7 +135,8 @@ class Polinomial:
         return hash(self.__str__())
 
     def __eq__(self, other):
-        return (self.n,self.a) == (other.n,other.a)
+        #for now
+        return isinstance(other,type(self)) and (self.n,self.a) == (other.n,other.a)
 
-for i in range(1,3):
-    Derivatives[Polinomial(i)]=Polinomial(i-1,i)
+    def Differentiate(self):
+        return Polinomial(self.n-1,self.a*self.n)

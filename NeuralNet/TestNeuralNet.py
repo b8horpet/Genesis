@@ -33,11 +33,18 @@ class TestNeuron(unittest.TestCase):
         self.assertEqual(b.OutputLayer.Neurons[0].Output,x)
 
     def test_Functions(self):
-        self.assertGreater(len(Derivatives),0)
         fxsqrd=Polinomial(2)
-        self.assertTrue(fxsqrd in Derivatives)
-        fxm2=Polinomial(1,2.0)
-        self.assertFalse(fxm2 in Derivatives)
+        self.assertTrue(fxsqrd.Differentiate() != None)
+        fxmult2=Polinomial(1,2)
+        self.assertTrue(fxsqrd.Differentiate() == fxmult2)
+        class duckpoly:
+            def __init__(self):
+                self.n=1
+                self.a=2
+        duck=duckpoly()
+        self.assertFalse(fxmult2 == duck)
+        linear=LinearFilter()
+        self.assertFalse(fxmult2 == linear)
 
 
 if __name__ == '__main__':
