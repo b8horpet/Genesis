@@ -1,9 +1,12 @@
+#author: b8horpet
+
+
 import unittest
 
 from NeuralNet import *
 
 
-class TestNeuron(unittest.TestCase):
+class TestNeuralNet(unittest.TestCase):
     def test_PureVirtual(self):
         """
         The base interface of all neural object should lack implementatiom.

@@ -1,4 +1,4 @@
-__author__ = 'b8horpet'
+#author: b8horpet
 
 
 import math

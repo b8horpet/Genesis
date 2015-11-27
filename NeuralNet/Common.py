@@ -1,4 +1,4 @@
-__author__ = 'b8horpet'
+#author: b8horpet
 
 
 from NeuralNet.Functions import *
@@ -6,7 +6,7 @@ from NeuralNet.Functions import *
 
 class NeuralObjectInterface:
 
-    Braveness=0.1
+    Braveness=0.001
 
     def __init__(self):
         raise PureVirtualCallException()

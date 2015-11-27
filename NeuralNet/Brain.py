@@ -1,4 +1,4 @@
-__author__ = 'b8horpet'
+#author: b8horpet
 
 
 from NeuralNet.Common import *
@@ -48,4 +48,4 @@ class Brain(NeuralObjectInterface):
         self.InputLayer.Propagate()
 
 
-print("Brain class imported")
+print("    Brain class imported")

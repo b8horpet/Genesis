@@ -1,4 +1,4 @@
-__author__ = 'b8horpet'
+#author: b8horpet
 
 
 from NeuralNet.Common import *
@@ -94,4 +94,4 @@ class FixedSynapsis(Synapsis):
 
 ConstantOne = ConstantNeuron()
 
-print("Neuron class imported")
+print("    Neuron class imported")
