@@ -2,11 +2,17 @@
 
 
 from Physics.Basics import *
-from Physics.Object import *
+#from Physics.Object import *
+#from Physics.Creature import *
 
 
 class World:
-    pass
+    def __init__(self):
+        """
+        ... and the programmer called the constructor, and there was World
+        """
+        self.Objects=[]
+        self.Creatures=[]
 
 
 print("    World class imported")

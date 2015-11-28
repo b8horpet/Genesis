@@ -105,11 +105,9 @@ class TestBasics(unittest.TestCase):
 
 class TestPhysics(unittest.TestCase):
     def test_CreateWorld(self):
-        try:
-            w=World()
-            self.assertTrue(True)
-        except:
-            self.assertTrue(False)
+        w=World()
+        w.Objects.append(Sphere())
+        w.Creatures.append(Creature())
 
 if __name__ == '__main__':
     unittest.main()
