@@ -2,6 +2,7 @@
 
 
 from Physics.Basics import *
+from Physics.Object import *
 
 
 class World:
