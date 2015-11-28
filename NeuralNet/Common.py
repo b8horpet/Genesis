@@ -9,10 +9,10 @@ class NeuralObjectInterface:
     Braveness=0.001
 
     def __init__(self):
-        raise PureVirtualCallException()
+        raise NotImplementedError()
 
     def Activate(self):
-        raise PureVirtualCallException()
+        raise NotImplementedError()
 
     def Propagate(self):
-        raise PureVirtualCallException()
+        raise NotImplementedError()

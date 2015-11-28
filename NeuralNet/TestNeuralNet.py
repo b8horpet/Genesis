@@ -12,7 +12,7 @@ class TestNeuralNet(unittest.TestCase):
         The base interface of all neural object should lack implementatiom.
         It is an abstract class. Cannot be initiated.
         """
-        with self.assertRaises(PureVirtualCallException):
+        with self.assertRaises(NotImplementedError):
             n=NeuralObjectInterface()
 
     def test_SignalTransferSpeed(self):

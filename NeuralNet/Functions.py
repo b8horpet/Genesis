@@ -4,16 +4,12 @@
 import math
 
 
-class PureVirtualCallException(Exception):
-    pass
-
-
 class FunctionObjectInterface:
     def __init__(self):
-        raise PureVirtualCallException
+        raise NotImplementedError()
 
     def __call__(self, *args, **kwargs):
-        raise PureVirtualCallException
+        raise NotImplementedError()
 
     def __eq__(self, other):
         return isinstance(other,type(self))
