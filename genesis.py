@@ -84,45 +84,50 @@ ny=len(imgs[0])
 nx=len(imgs[0][0])
 digs=len(imgs)
 
-Currimg=0
+Currimg=[0]
 def GetImgGetter(x:int,y:int):
-    global Currimg
     def GetInput():
-        return float(imgs[Currimg][y][x])
+        global Currimg
+        v=NeuralNet.ListValueHolder(Currimg)
+        return float(imgs[v()][y][x])
     return GetInput
 
 ImageProcessor=NeuralNet.Brain()
-cur=0
 for i in range(0,ny):
     for j in range(0,nx):
         ImageProcessor.InputLayer.Neurons.append(NeuralNet.InputNeuron())
-        ImageProcessor.InputLayer.Neurons[cur].GetInput=GetImgGetter(j,i)
-    cur+=1
+        ImageProcessor.InputLayer.Neurons[i*nx+j].GetInput=GetImgGetter(j,i)
 for i in range(0,digs):
     ImageProcessor.OutputLayer.Neurons.append(NeuralNet.OutputNeuron())
-    #ImageProcessor.OutputLayer.Neurons[i].TransferFilter=NeuralNet.TangentHyperbolic
+    ImageProcessor.OutputLayer.Neurons[i].TransferFilter=NeuralNet.TangentHyperbolic()
 
 # legyen egy hidden layer
 
 ImageProcessor.HiddenLayers.append(NeuralNet.NeuronLayer())
-cur=0
 for i in range(0,ny-1):
     for j in range(0,nx-1):
         ImageProcessor.HiddenLayers[0].Neurons.append(NeuralNet.HiddenNeuron())
-        #ImageProcessor.HiddenLayers[0].Neurons[cur].TransferFilter=NeuralNet.TangentHyperbolic
+        ImageProcessor.HiddenLayers[0].Neurons[i*(nx-1)+j].TransferFilter=NeuralNet.TangentHyperbolic()
         for ii in range(0,2):
             for jj in range(0,2):
-                NeuralNet.Synapsis(ImageProcessor.InputLayer.Neurons[(i+ii)*nx+j+jj],ImageProcessor.HiddenLayers[0].Neurons[cur],1.0)
+                NeuralNet.Synapsis(ImageProcessor.InputLayer.Neurons[(i+ii)*nx+j+jj],ImageProcessor.HiddenLayers[0].Neurons[i*(nx-1)+j],r.uniform(-0.1,0.1))
         for ii in range(0,digs):
-            NeuralNet.Synapsis(ImageProcessor.HiddenLayers[0].Neurons[cur],ImageProcessor.OutputLayer.Neurons[ii],1.0)
-        cur+=1
+            NeuralNet.Synapsis(ImageProcessor.HiddenLayers[0].Neurons[i*(nx-1)+j],ImageProcessor.OutputLayer.Neurons[ii],r.uniform(-0.1,0.1))
+
+NeuralNet.NeuralObjectInterface.Braveness=0.2
+for lol in range(0,50):
+    for digit in range(0, digs):
+        Currimg[0]=digit
+        ImageProcessor.Activate()
+        expected=[-1 for i in range(0,digs)]
+        expected[digit]=1
+        ImageProcessor.Propagate(expected)
 for digit in range(0, digs):
-    Currimg=digit
+    Currimg[0]=digit
     ImageProcessor.Activate()
-    #todo back propagation
     print("#%d:" % (digit))
     for i in range(0,digs):
-        print(ImageProcessor.OutputLayer.Neurons[i].Output)
+        print("%1.3f%%" % ((ImageProcessor.OutputLayer.Neurons[i].Output+1.0)*50.0))
     print()
 
 print("genesis project placeholder")
