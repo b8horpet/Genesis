@@ -1,9 +1,11 @@
-#author: b8horpet
+# author: b8horpet
 
 
 from Physics.Basics import *
-#from Physics.Object import *
-#from Physics.Creature import *
+
+
+# from Physics.Object import *
+# from Physics.Creature import *
 
 
 class World:
@@ -11,8 +13,23 @@ class World:
         """
         ... and the programmer called the constructor, and there was World
         """
-        self.Objects=[]
-        self.Creatures=[]
+        self.Objects = []
+        self.Creatures = []
+
+    def Physics(self, dT: float) -> None:
+        for o in self.Objects:
+            o.Physics(dT)
+        for c in self.Creatures:
+            c.Physics(dT)
+
+    def GetRenderData(self) -> list:
+        d = []
+        # Surface2D for now
+        for o in self.Objects:
+            d.append((o.Pos.x, o.Pos.y))
+        for c in self.Creatures:
+            d.append((c.Pos.x, c.Pos.y))
+        return d
 
 
 print("    World class imported")
