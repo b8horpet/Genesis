@@ -28,7 +28,7 @@ Besides learning, this project has some ambitious goals:
 - works on Linux (Ubuntu) and Windows
 - developed on x86_64 platform, it may need 64bit python to get enough memory
 - additional dependencies may change over time
-  - **neccessary:**
+  - **necessary:**
     - numpy
     - scipy
   - **planned:**
