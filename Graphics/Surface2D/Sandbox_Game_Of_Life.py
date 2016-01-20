@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 from matplotlib import animation
 
 N=20
-fig = plt.figure(figsize=(10,10))
+fig = plt.figure(figsize=(5,5))
 world = np.zeros((N,N),np.byte)
 #world[2,0]=1
 #world[2,1]=1
@@ -16,8 +16,8 @@ for i in range(0,N):
 backworld = world.copy()
 
 
-p = plt.scatter([],[],600,"000000",marker='s')
-plt.axis([-20,20,-20,20])
+p = plt.scatter([],[],200,"000000",marker='s')
+plt.axis([0,N,0,N])
 
 def updateworld():
     global world,backworld
