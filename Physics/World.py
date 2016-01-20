@@ -23,6 +23,7 @@ class World:
             c.Physics(dT)
 
     def GetRenderData(self) -> list:
+        self.Physics(0.05) # should not be here
         d = []
         # Surface2D for now
         for o in self.Objects:

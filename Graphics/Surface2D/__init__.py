@@ -1,7 +1,7 @@
 __author__ = 'b8horpet'
 
 
-print("importing.Surface2D Graphics")
+print("importing Graphics.Surface2D")
 
 from Graphics.Surface2D import MatPlotLib
 

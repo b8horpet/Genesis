@@ -1,7 +1,7 @@
 __author__ = 'b8horpet'
 
 
-print("importing.SurfaceCommon Graphics")
+print("importing Graphics.SurfaceCommon")
 
 from Graphics.SurfaceCommon import Surface
 
