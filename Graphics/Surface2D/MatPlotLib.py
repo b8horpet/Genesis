@@ -10,7 +10,8 @@ class MatplotLibSurface(Surface.SurfaceInterface):
         self.updater=u
         self.fig=plt.figure()
         # theres has to be a better way
-        self.scat=plt.scatter([-9,-9,9,9],[-9,9,-9,9])
+        self.scat=plt.scatter([],[])
+        plt.axis([-10,10,-10,10])
         def render(tick):
             self.scat.set_offsets(self.updater())
             return self.scat,

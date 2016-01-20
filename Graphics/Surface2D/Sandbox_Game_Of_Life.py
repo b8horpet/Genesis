@@ -16,7 +16,8 @@ for i in range(0,N):
 backworld = world.copy()
 
 
-p = plt.scatter([1,1,N-1,N-1],[1,N-1,1,N-1],600,"000000",marker='s')
+p = plt.scatter([],[],600,"000000",marker='s')
+plt.axis([-20,20,-20,20])
 
 def updateworld():
     global world,backworld
