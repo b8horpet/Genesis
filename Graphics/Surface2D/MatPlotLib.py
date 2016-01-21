@@ -15,7 +15,7 @@ class MatplotLibSurface(Surface.SurfaceInterface):
         def render(tick):
             self.scat.set_offsets(self.updater())
             return self.scat,
-        self.anim=animation.FuncAnimation(self.fig,render)
+        self.anim=animation.FuncAnimation(self.fig,render,interval=5)
 
     def StartRender(self):
         self.fig.set_size_inches(10,10)
