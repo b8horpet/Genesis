@@ -13,7 +13,10 @@ class MatplotLibSurface(Surface.SurfaceInterface):
         self.scat=plt.scatter([],[])
         plt.axis([-10,10,-10,10])
         def render(tick):
-            self.scat.set_offsets(self.updater())
+            offs,sizes,colors=self.updater()
+            self.scat.set_offsets(offs)
+            self.scat.set_sizes(sizes)
+            self.scat.set_facecolors(colors)
             return self.scat,
         self.anim=animation.FuncAnimation(self.fig,render,interval=5)
 

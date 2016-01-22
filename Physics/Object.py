@@ -35,7 +35,7 @@ class Sphere(Object):
     def Physics(self, dT: float):
         self.Pos+=dT*self.Vel+((dT**2)/2)*self.Acc
         self.Vel+=dT*self.Acc
-        self.Acc=Vector3D(0.0,-9.81,0.0)
+        self.Acc=Vector3D(0.0,0.0,0.0)
 
     def Collide(self, other):
         if hasattr(self,'reentry'):
