@@ -17,14 +17,14 @@ for i in range(0,N):
 c=Physics.Creature()
 alpha=np.pi*1.5
 #alpha+=np.random.uniform(-0.5,0.5)
-D=10
+D=3
 c.Pos.x=D*np.cos(alpha)
 c.Pos.y=D*np.sin(alpha)
-c.Vel=-0.5*c.Pos
+c.Vel=-2.5*c.Pos
 c.Vel.y-=0.2
 c.Vel.x-=0.2
 c.Radius/=2.0
-c.Mass*=10
+c.Mass*=1
 c.Frics=0.1,
 theWorld.Objects.append(c)
 theWorld.Creatures.append(c)
