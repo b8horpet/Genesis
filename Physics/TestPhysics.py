@@ -99,7 +99,7 @@ class TestBasics(unittest.TestCase):
     def test_Vector3D_cross(self):
         a=Vector3D(2,1,-1)
         b=Vector3D(1,3,5)
-        c=a**b
+        c=a%b
         self.assertEqual(c.x,8)
         self.assertEqual(c.y,-11)
         self.assertEqual(c.z,5)
