@@ -19,25 +19,38 @@ class Object:
 
     def Collide(self, other):
         """
-        Compute collision or possible interaction with other object
+        Compute collision with other object
+        """
+        raise NotImplementedError()
+
+    def DoCollision(self, other):
+        """
+        Handles the collision with the other object
         """
         raise NotImplementedError()
 
 class Sphere(Object):
     def __init__(self):
         self.Mass = 1.0
-        self.Radius = 1.0
+        self.Radius = 0.5
         self.Pos=Vector3D() # must be inside of the Object
         self.Vel=Vector3D()
         self.Acc=Vector3D()
+        self.Frics=0.0,0.0
         #might be better to store prev pos, than acceleration
 
     def Physics(self, dT: float):
+        ad=Vector3D(0.0,0.0,0.0)
+        for c in enumerate(self.Frics):
+            ad+=-1*c[1]*(abs(self.Vel)**c[0])*self.Vel
+        ad/=self.Mass
+        self.Acc+=ad
         self.Pos+=dT*self.Vel+((dT**2)/2)*self.Acc
         self.Vel+=dT*self.Acc
         self.Acc=Vector3D(0.0,0.0,0.0)
 
     def Collide(self, other):
+        #todo WTF?
         if hasattr(self,'reentry'):
             delattr(self,'reentry')
             return None
@@ -56,3 +69,9 @@ class Sphere(Object):
             delattr(self,'reentry')
         return retVal
 
+    def DoCollision(self, other):
+        #todo WTF
+        pcorr=self.Pos
+        vcorr=(self.Mass*self.Vel+other.Mass*other.Vel)/(self.Mass+other.Mass)
+        acorr=self.Acc
+        return pcorr,vcorr,acorr

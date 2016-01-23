@@ -55,7 +55,7 @@ class Vector2D:
     def __len__(self):
         return 2
 
-    def __pow__(self, power, modulo = None):
+    def __mod__(self, other):
         raise NotImplementedError()
 
 
@@ -111,9 +111,9 @@ class Vector3D(Vector2D):
     def __len__(self):
         return 3
 
-    def __pow__(self, power, modulo=None):
+    def __mod__(self, other):
         return Vector3D(
-            self.y*power.z-self.z*power.y,
-            self.z*power.x-self.x*power.z,
-            self.x*power.y-self.y*power.x
+            self.y*other.z-self.z*other.y,
+            self.z*other.x-self.x*other.z,
+            self.x*other.y-self.y*other.x
         )
