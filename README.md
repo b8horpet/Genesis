@@ -31,8 +31,8 @@ Besides learning, this project has some ambitious goals:
   - **necessary:**
     - numpy
     - scipy
+    - pyopengl
   - **planned:**
-    - pygame or pyopengl
     - pybrain
 - I use PyCharm IDE
 
