@@ -71,7 +71,6 @@ class Sphere(Object):
 
     def DoCollision(self, other):
         #todo WTF
-        pcorr=self.Pos
         d=other.Pos-self.Pos
         d/=abs(d)
         vtkp=(self.Mass*self.Vel+other.Mass*other.Vel)/(self.Mass+other.Mass)
@@ -80,5 +79,13 @@ class Sphere(Object):
         vp=v1-vm
         vcorr=vp-vm
         vcorr+=vtkp
-        acorr=self.Acc
+
+        pcorr=-1.0*d
+        dd=self.Radius+other.Radius
+        dd-=abs(other.Pos-self.Pos)
+        dd*=other.Mass
+        dd/=(other.Mass+self.Mass)
+        pcorr*=dd
+        vcorr-=self.Vel
+        acorr=Vector3D()
         return pcorr,vcorr,acorr

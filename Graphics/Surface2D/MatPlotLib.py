@@ -15,7 +15,7 @@ class MatplotLibSurface(Surface.SurfaceInterface):
         def render(tick):
             offs,sizes,colors=self.updater()
             self.scat.set_offsets(offs)
-            self.scat.set_sizes([(i*58)**2 for i in sizes])
+            self.scat.set_sizes([(i*55)**2 for i in sizes])
             self.scat.set_facecolors(colors)
             return self.scat,
         #self.anim=animation.FuncAnimation(self.fig,render,interval=5)
