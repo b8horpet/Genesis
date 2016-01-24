@@ -46,7 +46,7 @@ class World:
         # Surface2D for now
         for o in self.Objects:
             pos.append((o.Pos.x, o.Pos.y))
-            siz.append((o.Radius*58)**2)
+            siz.append(o.Radius)
             if type(o) == Creature:
                 col.append((1,0,0,1))
             else:
