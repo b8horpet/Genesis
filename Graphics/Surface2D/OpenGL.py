@@ -52,7 +52,7 @@ class OpenGL2DSurface(Surface.SurfaceInterface):
         glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH)
         glutInitWindowSize(640, 480)
         glutInitWindowPosition(0, 0)
-        self.window = glutCreateWindow("Genesis")
+        self.window = glutCreateWindow(b"Genesis")
         glutDisplayFunc(Surface.renderfunctor(self,OpenGL2DSurface.DrawGLScene))
         #glutFullScreen()
         glutIdleFunc(Surface.renderfunctor(self,OpenGL2DSurface.DrawGLScene))
