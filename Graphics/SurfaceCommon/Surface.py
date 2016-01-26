@@ -1,8 +1,8 @@
 #author: b8horpet
 
-def renderfunctor(this,func):
-    def f():
-        return func(this)
+def memberfunctor(this, func):
+    def f(*args,**kwargs):
+        return func(this,*args,**kwargs)
     return f
 
 

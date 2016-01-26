@@ -17,8 +17,8 @@ for i in range(0,6):
     f.Pos.x=d*np.cos(a)
     f.Pos.y=d*np.sin(a)
     theWorld.AddObject(f)
-#s=Graphics.Surface2D.OpenGL.OpenGL2DSurface(Graphics.SurfaceCommon.Surface.renderfunctor(theWorld,Physics.World.GetRenderData))
-s=Graphics.Surface2D.MatPlotLib.MatplotLibSurface(Graphics.SurfaceCommon.Surface.renderfunctor(theWorld,Physics.World.GetRenderData))
+s=Graphics.Surface2D.OpenGL.OpenGL2DSurface(Graphics.SurfaceCommon.Surface.memberfunctor(theWorld, Physics.World.GetRenderData))
+#s=Graphics.Surface2D.MatPlotLib.MatplotLibSurface(Graphics.SurfaceCommon.Surface.memberfunctor(theWorld,Physics.World.GetRenderData))
 # should be on other thread, or the physics must be on the render call
 s.StartRender()
 
