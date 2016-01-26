@@ -50,7 +50,7 @@ class OpenGL2DSurface(Surface.SurfaceInterface):
         self.updater=u
         glutInit(sys.argv)
         glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH)
-        glutInitWindowSize(640, 480)
+        glutInitWindowSize(1900, 1000)
         glutInitWindowPosition(0, 0)
         self.window = glutCreateWindow(b"Genesis")
         glutDisplayFunc(Surface.renderfunctor(self,OpenGL2DSurface.DrawGLScene))
@@ -67,7 +67,7 @@ class OpenGL2DSurface(Surface.SurfaceInterface):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glLoadIdentity()
 
-        scale=1.0
+        scale=2.0
         dist=20.0
         p,s,c=self.updater()
         for i in range(0,len(p)):

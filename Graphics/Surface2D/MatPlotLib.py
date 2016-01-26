@@ -19,9 +19,9 @@ class MatplotLibSurface(Surface.SurfaceInterface):
             self.scat.set_facecolors(colors)
             return self.scat,
         #self.anim=animation.FuncAnimation(self.fig,render,interval=5)
-        self.anim=animation.FuncAnimation(self.fig,render,frames=60)
+        self.anim=animation.FuncAnimation(self.fig,render,frames=500)
 
     def StartRender(self):
         self.fig.set_size_inches(10,10)
-        self.anim.save('simulation.gif', writer='imagemagick', fps=20, dpi=50)
+        self.anim.save('simulation.gif', writer='imagemagick', fps=25, dpi=40)
         #plt.show()

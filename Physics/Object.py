@@ -36,7 +36,9 @@ class Sphere(Object):
         self.Pos=Vector3D() # must be inside of the Object
         self.Vel=Vector3D()
         self.Acc=Vector3D()
-        self.Frics=0.0,0.0
+        self.Frics=0.0,0.0 # first is linear second is quadratic (like in water)
+        self.Color=(1,1,1,1)
+        self.Alive=True
         #might be better to store prev pos, than acceleration
 
     def Physics(self, dT: float):

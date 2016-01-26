@@ -2,6 +2,7 @@
 
 
 import math
+DEBUG=False
 
 
 class Vector2D:
@@ -57,6 +58,12 @@ class Vector2D:
 
     def __mod__(self, other):
         raise NotImplementedError()
+
+    def Normalize(self):
+        l=abs(self)
+        self.x/=l
+        self.y/=l
+        return self
 
 
 class Vector3D(Vector2D):
@@ -117,3 +124,10 @@ class Vector3D(Vector2D):
             self.z*other.x-self.x*other.z,
             self.x*other.y-self.y*other.x
         )
+
+    def Normalize(self):
+        l=abs(self)
+        self.x/=l
+        self.y/=l
+        self.z/=l
+        return self
