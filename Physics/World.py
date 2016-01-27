@@ -78,8 +78,9 @@ class World:
             mt=0.0
         for o in self.Objects:
             pos.append((o.Pos.x, o.Pos.y))
-            #tkp+=o.Mass*o.Pos
-            #mt+=o.Mass
+            if DEBUG:
+                tkp+=o.Mass*o.Pos
+                mt+=o.Mass
             siz.append(o.Radius)
             col.append(o.Color)
         if DEBUG:
