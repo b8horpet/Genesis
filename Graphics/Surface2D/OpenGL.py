@@ -59,7 +59,7 @@ class OpenGL2DSurface(Surface.SurfaceInterface):
         self.shift=Vector2D()
         self.Width=640
         self.Height=480
-        self.TimeMS=20
+        self.TimeMS=50
         now=datetime.datetime.now()
         self.LastRender=[now for i in range(0,10)]
         glutInit(sys.argv)
@@ -83,7 +83,7 @@ class OpenGL2DSurface(Surface.SurfaceInterface):
         now=datetime.datetime.now()
         timediff=now-self.LastRender.pop()
         self.LastRender.insert(0,now)
-        timediff/=(len(self.LastRender))
+        timediff/=len(self.LastRender)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glLoadIdentity()
 
