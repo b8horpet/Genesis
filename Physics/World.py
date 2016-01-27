@@ -67,7 +67,7 @@ class World:
             c.Logic()
 
     def GetRenderData(self):
-        for i in range(0,20):
+        for i in range(0,5):
             self.Physics(0.01) # should not be here
         pos = []
         siz = []

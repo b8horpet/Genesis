@@ -8,6 +8,7 @@ import numpy as np
 from enum import  Enum
 import sys
 from Physics.Basics import Vector2D
+import datetime
 
 
 class Keys(Enum):
@@ -45,6 +46,9 @@ def ReSizeGLScene(Width, Height):
     gluPerspective(45.0, float(Width)/float(Height), 0.1, 100.0)
     glMatrixMode(GL_MODELVIEW)
 
+def foo():
+    pass
+
 
 class OpenGL2DSurface(Surface.SurfaceInterface):
     def __init__(self,u):
@@ -53,22 +57,33 @@ class OpenGL2DSurface(Surface.SurfaceInterface):
         self.scale=1.0
         self.dist=10
         self.shift=Vector2D()
+        self.Width=640
+        self.Height=480
+        self.TimeMS=20
+        now=datetime.datetime.now()
+        self.LastRender=[now for i in range(0,10)]
         glutInit(sys.argv)
         glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH)
-        glutInitWindowSize(1900, 1000)
+        glutInitWindowSize(self.Width, self.Height)
         glutInitWindowPosition(0, 0)
         self.window = glutCreateWindow(b"Genesis")
-        glutDisplayFunc(Surface.memberfunctor(self, OpenGL2DSurface.DrawGLScene))
+        #glutDisplayFunc(Surface.memberfunctor(self, OpenGL2DSurface.DrawGLScene))
         #glutFullScreen()
-        glutIdleFunc(Surface.memberfunctor(self, OpenGL2DSurface.DrawGLScene))
+        #glutIdleFunc(Surface.memberfunctor(self, OpenGL2DSurface.DrawGLScene))
         glutReshapeFunc(ReSizeGLScene)
         glutKeyboardFunc(Surface.memberfunctor(self,OpenGL2DSurface.keyPressed))
-        InitGL(640, 480)
+        InitGL(self.Width, self.Height)
 
     def StartRender(self):
+        glutTimerFunc(self.TimeMS,Surface.memberfunctor(self, OpenGL2DSurface.DrawGLScene),0)
         glutMainLoop()
 
-    def DrawGLScene(self):
+    def DrawGLScene(self,*args,**kwargs):
+        glutTimerFunc(self.TimeMS,Surface.memberfunctor(self, OpenGL2DSurface.DrawGLScene),0)
+        now=datetime.datetime.now()
+        timediff=now-self.LastRender.pop()
+        self.LastRender.insert(0,now)
+        timediff/=(len(self.LastRender))
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glLoadIdentity()
 
@@ -88,6 +103,9 @@ class OpenGL2DSurface(Surface.SurfaceInterface):
             glTranslatef(-p[i][0], -p[i][1], 0)
         glTranslatef(-self.shift.x,-self.shift.y,self.dist)
 
+        glColor3f(1,1,1)
+        glWindowPos2i(0,self.Height-18)
+        glutBitmapString(OpenGL.GLUT.GLUT_BITMAP_HELVETICA_18,bytes("%5.2f FPS" % (1000000.0/timediff.microseconds),'utf-8'))
         glutSwapBuffers()
 
     def keyPressed(self, *args):
