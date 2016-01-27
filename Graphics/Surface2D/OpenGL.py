@@ -36,20 +36,6 @@ def InitGL(Width, Height):
     glMatrixMode(GL_MODELVIEW)
 
 
-def ReSizeGLScene(Width, Height):
-    if Height == 0:
-            Height = 1
-
-    glViewport(0, 0, Width, Height)
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
-    gluPerspective(45.0, float(Width)/float(Height), 0.1, 100.0)
-    glMatrixMode(GL_MODELVIEW)
-
-def foo():
-    pass
-
-
 class OpenGL2DSurface(Surface.SurfaceInterface):
     def __init__(self,u):
         self.window=0
@@ -70,7 +56,7 @@ class OpenGL2DSurface(Surface.SurfaceInterface):
         #glutDisplayFunc(Surface.memberfunctor(self, OpenGL2DSurface.DrawGLScene))
         #glutFullScreen()
         #glutIdleFunc(Surface.memberfunctor(self, OpenGL2DSurface.DrawGLScene))
-        glutReshapeFunc(ReSizeGLScene)
+        glutReshapeFunc(Surface.memberfunctor(self,OpenGL2DSurface.ReSizeGLScene))
         glutKeyboardFunc(Surface.memberfunctor(self,OpenGL2DSurface.keyPressed))
         InitGL(self.Width, self.Height)
 
@@ -78,7 +64,7 @@ class OpenGL2DSurface(Surface.SurfaceInterface):
         glutTimerFunc(self.TimeMS,Surface.memberfunctor(self, OpenGL2DSurface.DrawGLScene),0)
         glutMainLoop()
 
-    def DrawGLScene(self,*args,**kwargs):
+    def DrawGLScene(self, *args, **kwargs):
         glutTimerFunc(self.TimeMS,Surface.memberfunctor(self, OpenGL2DSurface.DrawGLScene),0)
         now=datetime.datetime.now()
         timediff=now-self.LastRender.pop()
@@ -126,3 +112,15 @@ class OpenGL2DSurface(Surface.SurfaceInterface):
         elif k == Keys.ZoomOut.value:
             if self.dist<1024:
                 self.dist*=2
+
+    def ReSizeGLScene(self, Width, Height):
+        if Height == 0:
+                Height = 1
+
+        self.Width=Width
+        self.Height=Height
+        glViewport(0, 0, Width, Height)
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()
+        gluPerspective(45.0, float(Width)/float(Height), 0.1, 100.0)
+        glMatrixMode(GL_MODELVIEW)
