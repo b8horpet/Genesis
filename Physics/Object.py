@@ -52,24 +52,11 @@ class Sphere(Object):
         self.Acc=Vector3D(0.0,0.0,0.0)
 
     def Collide(self, other):
-        #todo WTF?
-        if hasattr(self,'reentry'):
-            delattr(self,'reentry')
-            return None
-        self.reentry=False
-        #do magic
-        if isinstance(other,Sphere):
-            retVal1 = abs(self.Pos-other.Pos)<(self.Radius+other.Radius)
-        else:
-            retVal1 = abs(self.Pos-other.Pos)<self.Radius
-        retVal2 = other.Collide(self)
-        if retVal1 or retVal2: # handle None
-            retVal=True
-        else:
-            retVal=False
-        if hasattr(self,'reentry'):
-            delattr(self,'reentry')
-        return retVal
+        rad_sum=self.Radius+other.Radius
+        pos_diff=self.Pos-other.Pos
+        if abs(pos_diff.x) > rad_sum or abs(pos_diff.y) > rad_sum:
+            return False
+        return pos_diff*pos_diff < rad_sum**2
 
     def DoCollision(self, other):
         #todo WTF
