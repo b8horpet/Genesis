@@ -3,6 +3,7 @@
 
 import math
 DEBUG=False
+PROFILE=False
 
 
 class Vector2D:

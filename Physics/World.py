@@ -6,6 +6,8 @@ from Physics.Basics import *
 
 from Physics.Object import *
 from Physics.Creature import *
+import cProfile, pstats
+
 
 
 class World:
@@ -67,8 +69,18 @@ class World:
             c.Logic()
 
     def GetRenderData(self):
+        if PROFILE:
+            pr = cProfile.Profile()
+            pr.enable()
         for i in range(0,5):
             self.Physics(0.01) # should not be here
+            #cProfile.run('theWorld.Physics(0.01)')
+        if PROFILE:
+            pr.disable()
+            sortby = 'cumulative'
+            ps = pstats.Stats(pr).sort_stats(sortby)
+            ps.print_stats()
+
         pos = []
         siz = []
         col = []
