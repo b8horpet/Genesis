@@ -11,6 +11,10 @@ from Physics.Basics import Vector2D
 import datetime
 
 
+circle_ang=36
+circle_temp=tuple([Vector2D(np.cos(i*np.pi*2/circle_ang),np.sin(i*np.pi*2/circle_ang)) for i in range(0,circle_ang)])
+
+
 class Keys(Enum):
     Escape = b'\x1b'
     Up = b'w'
@@ -80,11 +84,8 @@ class OpenGL2DSurface(Surface.SurfaceInterface):
             glBegin(GL_POLYGON)
             glColor3f(c[i][0],c[i][1],c[i][2])
             r=s[i]/self.scale
-            for j in range(0,360):
-                a=j*np.pi/180.0
-                x=np.cos(a)*r
-                y=np.sin(a)*r
-                glVertex3f(x, y, 0.0)
+            for j in range(0,circle_ang):
+                glVertex3f(circle_temp[j].x*r, circle_temp[j].y*r, 0.0)
             glEnd()
             glTranslatef(-p[i][0], -p[i][1], 0)
         glTranslatef(-self.shift.x,-self.shift.y,self.dist)
