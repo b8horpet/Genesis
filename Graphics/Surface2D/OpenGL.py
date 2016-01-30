@@ -23,6 +23,7 @@ class Keys(Enum):
     Right = b'd'
     ZoomIn = b'+'
     ZoomOut = b'-'
+    FullScreen = b'f'
 
 
 def InitGL(Width, Height):
@@ -46,10 +47,11 @@ class OpenGL2DSurface(Surface.SurfaceInterface):
         self.window=0
         self.updater=u
         self.scale=1.0
-        self.dist=10
+        self.dist=64 # for fullhd fullscreen
         self.shift=Vector2D()
         self.Width=640
         self.Height=480
+        self.FullScreen=True
         self.TimeMS=50
         now=datetime.datetime.now()
         self.LastRender=[now for i in range(0,10)]
@@ -59,7 +61,7 @@ class OpenGL2DSurface(Surface.SurfaceInterface):
         glutInitWindowPosition(0, 0)
         self.window = glutCreateWindow(b"Genesis")
         #glutDisplayFunc(Surface.memberfunctor(self, OpenGL2DSurface.DrawGLScene))
-        #glutFullScreen()
+        glutFullScreen()
         #glutIdleFunc(Surface.memberfunctor(self, OpenGL2DSurface.DrawGLScene))
         glutReshapeFunc(Surface.memberfunctor(self,OpenGL2DSurface.ReSizeGLScene))
         glutKeyboardFunc(Surface.memberfunctor(self,OpenGL2DSurface.keyPressed))
@@ -100,6 +102,13 @@ class OpenGL2DSurface(Surface.SurfaceInterface):
         k=args[0]
         if k == Keys.Escape.value:
             sys.exit()
+        elif k == Keys.FullScreen.value:
+            if self.FullScreen:
+                self.FullScreen=False
+                glutReshapeWindow(640,480)
+            else:
+                self.FullScreen=True
+                glutFullScreen()
         elif k == Keys.Up.value:
             self.shift.y-=self.dist/10.0
         elif k == Keys.Down.value:

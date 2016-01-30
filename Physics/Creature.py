@@ -23,14 +23,14 @@ class Creature(Sphere): # one cell, spheric (for now)
             self.Pos=None
 
         def Activate(self):
-            if self.Parent.Energy > 0.0:
+            if self.Parent.Energy > 0.0 and self.Parent.Health > 0.0:
                 if self.Pos != None:
                     d=self.Parent.Pos-self.Pos
                     d.Normalize()
                     self.NeuronX.Inputs[0]=d.x
                     self.NeuronY.Inputs[0]=d.y
                     self.Pos=None
-                self.Parent.Energy-=0.01
+                self.Parent.Energy-=0.05
 
     class Motor(Organ):
         def __init__(self,p,nx,ny):
@@ -38,13 +38,12 @@ class Creature(Sphere): # one cell, spheric (for now)
             self.NeuronX=nx
             self.NeuronY=ny
 
-
         def Activate(self):
-            if self.Parent.Energy > 0.0:
-                self.Parent.Acc.x-=self.NeuronX.Output/10.0
-                self.Parent.Acc.y-=self.NeuronY.Output/10.0
+            if self.Parent.Energy > 0.0 and self.Parent.Health > 0.0:
+                self.Parent.Acc.x-=self.NeuronX.Output
+                self.Parent.Acc.y-=self.NeuronY.Output
                 for f in self.Parent.Frics:
-                    self.Parent.Energy-=f*0.1
+                    self.Parent.Energy-=f*0.2
 
     def __init__(self):
         super(Creature,self).__init__()
@@ -73,20 +72,37 @@ class Creature(Sphere): # one cell, spheric (for now)
             o.Activate()
         super(Creature,self).Physics(dT)
         if self.Energy<100.0:
-            self.Health-=0.1
+            self.Health-=0.5
         if self.Health<=0.0:
-            self.Color = (1,0,0,1)
+            if self.Energy > 0:
+                self.Color=(1,1,0,1)
+            else:
+                self.Color=(1,0,0,1)
             self.Energy-=1.0
             if self.Energy < -1000.0:
                 self.Alive=False
 
     def DoCollision(self, other):
-        if type(other) != Food:
+        if type(other) == Food:
+            pass # food does the job
+        elif type(other) == Creature:
+            if other.Health <= 0.0:
+                if self.Energy > 0.0 and self.Health > 0.0:
+                    self.Energy+=other.Energy/10
+                    other.Energy=0.0
+                    # get rid of body, let's say it swallowed the whole
+                    other.Alive=False
+            elif other.Energy > 0.0:
+                self.Health-=other.Energy/100 # and they bite
+                # although biting doesn't cost energy now
+            else:
+                pass # they are soft, do not deal damage from collision
+        else:
             self.Health-=1.0
         return super(Creature,self).DoCollision(other)
 
     def Logic(self):
-        if self.Energy > 0.0:
+        if self.Energy > 0.0 and self.Health > 0.0:
             self.Brain.Activate()
             self.Energy-=0.05
 
@@ -94,10 +110,16 @@ class Creature(Sphere): # one cell, spheric (for now)
 class Food(Sphere):
     def __init__(self):
         super(Food,self).__init__()
-        self.Nutrient=100.0
+        self.Nutrient=200.0
         self.Radius=0.1
         self.Mass=0.1
         self.Color=(1,1,0,1)
+
+    def Physics(self, dT: float):
+        self.Nutrient-=dT*10
+        if self.Nutrient<=0.0:
+            self.Alive=False
+        super(Food,self).Physics(dT)
 
     def DoCollision(self, other):
         if type(other) == Creature:

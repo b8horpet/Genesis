@@ -9,14 +9,24 @@ from Physics.Creature import *
 import cProfile, pstats
 
 
+def ConstantFrics(p: Vector3D) -> float:
+    return 0.05,0.3
+
 
 class World:
+    class Geometry:
+        def __init__(self):
+            self.UpdateFrics=ConstantFrics
+
     def __init__(self):
         """
         ... and the programmer called the constructor, and there was World
         """
         self.Objects = []
         self.Creatures = []
+        self.ObjLimit=50
+        self.Size=25.0
+        self.Geometry = World.Geometry()
         if DEBUG:
             self.tkp=None
             self.dtkp=None
@@ -35,6 +45,7 @@ class World:
         dead=[]
         for o in self.Objects:
             if o.Alive:
+                o.Frics=self.Geometry.UpdateFrics(o.Pos)
                 o.Physics(dT)
             else:
                 dead.append(o)
@@ -57,6 +68,8 @@ class World:
             p.Pos+=pc[0]
             p.Vel+=pc[1]
             p.Acc+=pc[2]
+
+    def Logic(self):
         for c in self.Creatures:
             ps=c.Pos
             mx=100.0
@@ -68,13 +81,26 @@ class World:
                     c.Organs[0].Pos=oj.Pos
             c.Logic()
 
+    def Activate(self):
+        if len(self.Objects)<self.ObjLimit:
+            r=np.random.uniform(0.0,100.0)
+            if r < 10:
+                if r < 0.5:
+                    o=Creature()
+                else:
+                    o=Food()
+                o.Pos=Vector3D(np.random.uniform(-self.Size,self.Size),np.random.uniform(-self.Size,self.Size))
+                self.AddObject(o)
+        for i in range(0,5):
+            self.Physics(0.01)
+        self.Logic()
+
     def GetRenderData(self):
         if PROFILE:
             pr = cProfile.Profile()
             pr.enable()
-        for i in range(0,5):
-            self.Physics(0.01) # should not be here
-            #cProfile.run('theWorld.Physics(0.01)')
+        self.Activate()
+            #cProfile.run('theWorld.Activate()')
         if PROFILE:
             pr.disable()
             sortby = 'cumulative'
@@ -101,7 +127,7 @@ class World:
                 if self.tkp != None:
                     if self.dtkp != None:
                         if abs(abs(self.tkp-tkp)-self.dtkp)>0.001:
-                            #print("impulse fucked")
+                            #print("momentum fucked")
                             self.dtkp=abs(self.tkp-tkp)
                     else:
                         self.dtkp=abs(self.tkp-tkp)
