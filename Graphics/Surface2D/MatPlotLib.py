@@ -11,17 +11,19 @@ class MatplotLibSurface(Surface.SurfaceInterface):
         self.fig=plt.figure()
         # theres has to be a better way
         self.scat=plt.scatter([],[])
-        plt.axis([-10,10,-10,10])
+        plt.axis([-25,25,-25,25])
         def render(tick):
-            offs,sizes,colors=self.updater()
+            offs,sizes,colors,text=self.updater()
             self.scat.set_offsets(offs)
             self.scat.set_sizes([(i*55)**2 for i in sizes])
             self.scat.set_facecolors(colors)
             return self.scat,
         #self.anim=animation.FuncAnimation(self.fig,render,interval=5)
-        self.anim=animation.FuncAnimation(self.fig,render,frames=500)
+        self.anim=animation.FuncAnimation(self.fig,render,frames=20*60)
 
     def StartRender(self):
-        self.fig.set_size_inches(10,10)
-        self.anim.save('simulation.gif', writer='imagemagick', fps=25, dpi=40)
+        self.fig.set_size_inches(25,25)
+        Writer = animation.writers['avconv']
+        writer = Writer(fps=20, metadata=dict(artist='b8horpet'), bitrate=-1)
+        self.anim.save('simulation.mp4', writer=writer)
         #plt.show()

@@ -24,6 +24,8 @@ class Keys(Enum):
     ZoomIn = b'+'
     ZoomOut = b'-'
     FullScreen = b'f'
+    Slow = b' '
+    Home = b'h'
 
 
 def InitGL(Width, Height):
@@ -46,12 +48,12 @@ class OpenGL2DSurface(Surface.SurfaceInterface):
     def __init__(self,u):
         self.window=0
         self.updater=u
-        self.scale=1.0
         self.dist=64 # for fullhd fullscreen
         self.shift=Vector2D()
         self.Width=640
         self.Height=480
         self.FullScreen=True
+        self.Slow=False
         self.TimeMS=50
         now=datetime.datetime.now()
         self.LastRender=[now for i in range(0,10)]
@@ -80,16 +82,21 @@ class OpenGL2DSurface(Surface.SurfaceInterface):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glLoadIdentity()
 
+        nc=1
         glTranslatef(self.shift.x,self.shift.y,-self.dist)
-        p,s,c=self.updater()
+        p,s,c,t=self.updater()
         for i in range(0,len(p)):
             glTranslatef(p[i][0], p[i][1], 0)
             glBegin(GL_POLYGON)
             glColor3f(c[i][0],c[i][1],c[i][2])
-            r=s[i]/self.scale
+            r=s[i]
             for j in range(0,circle_ang):
                 glVertex3f(circle_temp[j].x*r, circle_temp[j].y*r, 0.0)
             glEnd()
+            if len(t[i])>0:
+                nc+=1
+                glWindowPos2i(0,self.Height-18*nc)
+                glutBitmapString(OpenGL.GLUT.GLUT_BITMAP_HELVETICA_18,bytes(t[i],'utf-8'))
             glTranslatef(-p[i][0], -p[i][1], 0)
         glTranslatef(-self.shift.x,-self.shift.y,self.dist)
 
@@ -123,6 +130,16 @@ class OpenGL2DSurface(Surface.SurfaceInterface):
         elif k == Keys.ZoomOut.value:
             if self.dist<1024:
                 self.dist*=2
+        elif k == Keys.Slow.value:
+            if self.Slow:
+                self.Slow=False
+                self.TimeMS//=4
+            else:
+                self.Slow=True
+                self.TimeMS*=4
+        elif k == Keys.Home.value:
+            self.shift=Vector2D()
+            self.dist=64
 
     def ReSizeGLScene(self, Width, Height):
         if Height == 0:

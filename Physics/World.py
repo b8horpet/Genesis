@@ -26,6 +26,7 @@ class World:
         self.Creatures = []
         self.ObjLimit=50
         self.Size=25.0
+        self.TickCnt=0
         self.Geometry = World.Geometry()
         if DEBUG:
             self.tkp=None
@@ -62,12 +63,8 @@ class World:
             pc=p.DoCollision(o)
             colleffs.append(((o,oc),(p,pc)))
         for (o,oc),(p,pc) in colleffs:
-            o.Pos+=oc[0]
-            o.Vel+=oc[1]
-            o.Acc+=oc[2]
-            p.Pos+=pc[0]
-            p.Vel+=pc[1]
-            p.Acc+=pc[2]
+            o.DoEffect(pc)
+            p.DoEffect(oc)
 
     def Logic(self):
         for c in self.Creatures:
@@ -81,7 +78,7 @@ class World:
                     c.Organs[0].Pos=oj.Pos
             c.Logic()
 
-    def Activate(self):
+    def Spawn(self):
         if len(self.Objects)<self.ObjLimit:
             r=np.random.uniform(0.0,100.0)
             if r < 10:
@@ -91,9 +88,17 @@ class World:
                     o=Food()
                 o.Pos=Vector3D(np.random.uniform(-self.Size,self.Size),np.random.uniform(-self.Size,self.Size))
                 self.AddObject(o)
+
+
+    def Activate(self):
         for i in range(0,5):
+            self.TickCnt+=1
+            self.TickCnt%=5
+            if self.TickCnt == 1:
+                self.Spawn()
             self.Physics(0.01)
-        self.Logic()
+            if self.TickCnt == 0:
+                self.Logic()
 
     def GetRenderData(self):
         if PROFILE:
@@ -110,6 +115,7 @@ class World:
         pos = []
         siz = []
         col = []
+        txt = []
         # Surface2D for now
         if DEBUG:
             tkp=Vector3D()
@@ -121,6 +127,10 @@ class World:
                 mt+=o.Mass
             siz.append(o.Radius)
             col.append(o.Color)
+            if type(o) == Creature:
+                txt.append("%3.3f %4.3f" % (o.Health, o.Energy))
+            else:
+                txt.append("")
         if DEBUG:
             if mt>0.0:
                 tkp/=mt
@@ -135,7 +145,7 @@ class World:
                 pos.append((tkp.x,tkp.y))
                 siz.append(0.1)
                 col.append((0,0,1,1))
-        return pos,siz,col
+        return pos,siz,col,txt
 
 
 print("    World class imported")

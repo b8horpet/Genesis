@@ -8,6 +8,10 @@ class Object:
     """
     Simulation of real world objects
     """
+    class Effect:
+        def __init__(self):
+            raise NotImplementedError()
+
     def __init__(self):
         raise NotImplementedError()
 
@@ -30,6 +34,14 @@ class Object:
         raise NotImplementedError()
 
 class Sphere(Object):
+    class PhysEffect(Object.Effect):
+        def __init__(self, p=Vector3D(), v=Vector3D(), a=Vector3D(), m=0.0, r=0.0):
+            self.dP=p
+            self.dV=v
+            self.dA=a
+            self.dM=m
+            self.dR=r
+
     def __init__(self):
         self.Mass = 1.0
         self.Radius = 0.5
@@ -60,10 +72,10 @@ class Sphere(Object):
 
     def DoCollision(self, other):
         #todo WTF
-        d=other.Pos-self.Pos
+        d=self.Pos-other.Pos
         d/=abs(d)
         vtkp=(self.Mass*self.Vel+other.Mass*other.Vel)/(self.Mass+other.Mass)
-        v1=self.Vel-vtkp
+        v1=other.Vel-vtkp
         vm=(v1*d)*d
         vp=v1-vm
         vcorr=vp-vm
@@ -72,9 +84,16 @@ class Sphere(Object):
         pcorr=-1.0*d
         dd=self.Radius+other.Radius
         dd-=abs(other.Pos-self.Pos)
-        dd*=other.Mass
+        dd*=self.Mass
         dd/=(other.Mass+self.Mass)
         pcorr*=dd
-        vcorr-=self.Vel
+        vcorr-=other.Vel
         acorr=Vector3D()
-        return pcorr,vcorr,acorr
+        return Sphere.PhysEffect(pcorr,vcorr,acorr)
+
+    def DoEffect(self, e):
+        self.Pos+=e.dP
+        self.Vel+=e.dV
+        self.Acc+=e.dA
+        self.Mass+=e.dM
+        self.Radius+=e.dR

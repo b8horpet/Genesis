@@ -8,6 +8,13 @@ import numpy as np
 
 
 class Creature(Sphere): # one cell, spheric (for now)
+    class Interact(Sphere.PhysEffect):
+        def __init__(self, ph):
+            super(Creature.Interact,self).__init__(ph.dP,ph.dV,ph.dA)
+            self.dE=0.0
+            self.dH=0.0
+            self.Kill=False
+
     class Organ:
         def __init__(self,p):
             self.Parent=p
@@ -70,41 +77,56 @@ class Creature(Sphere): # one cell, spheric (for now)
     def Physics(self, dT: float):
         for o in self.Organs:
             o.Activate()
-        super(Creature,self).Physics(dT)
-        if self.Energy<100.0:
+        if self.Energy<100.0 and self.Health > 0.0:
             self.Health-=0.5
+            self.Energy+=5.0
+        elif self.Energy>1000.0 and self.Health < 95.0:
+            self.Energy-=20.0
+            self.Health+=1.0
         if self.Health<=0.0:
+            self.Mass=0.1
             if self.Energy > 0:
                 self.Color=(1,1,0,1)
             else:
                 self.Color=(1,0,0,1)
-            self.Energy-=1.0
+            self.Energy-=0.5
             if self.Energy < -1000.0:
                 self.Alive=False
+        super(Creature,self).Physics(dT)
 
     def DoCollision(self, other):
+        e = Creature.Interact(super(Creature,self).DoCollision(other))
         if type(other) == Food:
             pass # food does the job
         elif type(other) == Creature:
             if other.Health <= 0.0:
                 if self.Energy > 0.0 and self.Health > 0.0:
-                    self.Energy+=other.Energy/10
-                    other.Energy=0.0
-                    # get rid of body, let's say it swallowed the whole
-                    other.Alive=False
+                    e.dE-=other.Energy
+                    e.Kill=True
             elif other.Energy > 0.0:
-                self.Health-=other.Energy/100 # and they bite
-                # although biting doesn't cost energy now
+                e.dE-=5.0
+            if self.Health <= 0.0:
+                if other.Energy > 0.0 and other.Health > 0.0:
+                    e.dE+=self.Energy/10
+            elif self.Energy > 0.0:
+                e.dH-=self.Energy/100 # and they bite
             else:
                 pass # they are soft, do not deal damage from collision
         else:
-            self.Health-=1.0
-        return super(Creature,self).DoCollision(other)
+            self.Health-=1.0 # hm, haven't thought of this
+        return e
 
     def Logic(self):
         if self.Energy > 0.0 and self.Health > 0.0:
             self.Brain.Activate()
             self.Energy-=0.05
+
+    def DoEffect(self, e):
+        self.Energy+=e.dE
+        self.Health+=e.dH
+        if e.Kill:
+            self.Alive=False
+        super(Creature,self).DoEffect(e)
 
 
 class Food(Sphere):
@@ -122,9 +144,10 @@ class Food(Sphere):
         super(Food,self).Physics(dT)
 
     def DoCollision(self, other):
+        e=Creature.Interact(super(Food,self).DoCollision(other))
         if type(other) == Creature:
-            if other.Health > 0.0:
-                other.Energy+=self.Nutrient
+            if other.Health > 0.0 and other.Energy > 0.0:
+                e.dE=self.Nutrient
                 self.Nutrient=0.0
                 self.Alive=False
-        return super(Food,self).DoCollision(other)
+        return e
