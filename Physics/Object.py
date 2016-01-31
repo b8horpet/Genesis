@@ -12,8 +12,11 @@ class Object:
         def __init__(self):
             raise NotImplementedError()
 
+    ID=0
+
     def __init__(self):
-        raise NotImplementedError()
+        Object.ID+=1
+        self.ID=Object.ID
 
     def Physics(self, dT: float):
         """
@@ -43,6 +46,7 @@ class Sphere(Object):
             self.dR=r
 
     def __init__(self):
+        super(Sphere,self).__init__()
         self.Mass = 1.0
         self.Radius = 0.5
         self.Pos=Vector3D() # must be inside of the Object

@@ -102,7 +102,7 @@ class OpenGL2DSurface(Surface.SurfaceInterface):
 
         glColor3f(1,1,1)
         glWindowPos2i(0,self.Height-18)
-        glutBitmapString(OpenGL.GLUT.GLUT_BITMAP_HELVETICA_18,bytes("%5.2f FPS" % (1000000.0/timediff.microseconds),'utf-8'))
+        glutBitmapString(OpenGL.GLUT.GLUT_BITMAP_HELVETICA_18,bytes("%d object @%5.2f FPS" % (len(p),1000000.0/timediff.microseconds),'utf-8'))
         glutSwapBuffers()
 
     def keyPressed(self, *args):
