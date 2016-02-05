@@ -1,0 +1,11 @@
+Improving numerical precision:
+- RK4
+- adaptive steps
+- Richardson Extrapolation and the Bulirsch-Stoer Method
+- ???
+Improving performance:
+- real space partitioning (k-d trees?)
+- using threads (real multicore threading)
+- using OpenCL/CUDA
+Problems:
+- Collisions should be detected in time not when already should've happened
