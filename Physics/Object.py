@@ -58,6 +58,10 @@ class Sphere(Object):
         #might be better to store prev pos, than acceleration
 
     def Physics(self, dT: float):
+        #self.Eulerish(dT)
+        self.RK4(dT)
+
+    def Eulerish(self, dT: float):
         ad=Vector3D(0.0,0.0,0.0)
         for c in enumerate(self.Frics):
             ad+=-1*c[1]*(abs(self.Vel)**c[0])*self.Vel
@@ -65,6 +69,20 @@ class Sphere(Object):
         self.Acc+=ad
         self.Pos+=dT*self.Vel+((dT**2)/2)*self.Acc
         self.Vel+=dT*self.Acc
+        self.Acc=Vector3D(0.0,0.0,0.0)
+
+    def RK4(self, dT: float):
+        ad=Vector3D(0.0,0.0,0.0)
+        for c in enumerate(self.Frics):
+            ad+=-1*c[1]*(abs(self.Vel)**c[0])*self.Vel
+        ad/=self.Mass
+        self.Acc+=ad
+        k1=(dT*self.Vel,dT*self.Acc)
+        k2=(dT*(self.Vel+0.5*k1[0]),dT*(self.Acc+0.5*k1[1]))
+        k3=(dT*(self.Vel+0.5*k2[0]),dT*(self.Acc+0.5*k2[1]))
+        k4=(dT*(self.Vel+k3[0]),dT*(self.Acc+k3[1]))
+        self.Pos+=(1.0/6.0)*(k1[0]+2*k2[0]+2*k3[0]+k4[0])
+        self.Vel+=(1.0/6.0)*(k1[1]+2*k2[1]+2*k3[1]+k4[1])
         self.Acc=Vector3D(0.0,0.0,0.0)
 
     def Collide(self, other):
