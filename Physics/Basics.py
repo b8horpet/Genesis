@@ -6,6 +6,12 @@ DEBUG=False
 PROFILE=False
 
 
+def memberfunctor(this, func):
+    def f(*args,**kwargs):
+        return func(this,*args,**kwargs)
+    return f
+
+
 class Vector2D:
     Dimension = 2
 

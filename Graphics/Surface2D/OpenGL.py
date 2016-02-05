@@ -7,7 +7,7 @@ from Graphics.SurfaceCommon import Surface
 import numpy as np
 from enum import  Enum
 import sys
-from Physics.Basics import Vector2D
+from Physics.Basics import Vector2D,memberfunctor
 import datetime
 
 
@@ -62,19 +62,19 @@ class OpenGL2DSurface(Surface.SurfaceInterface):
         glutInitWindowSize(self.Width, self.Height)
         glutInitWindowPosition(0, 0)
         self.window = glutCreateWindow(b"Genesis")
-        #glutDisplayFunc(Surface.memberfunctor(self, OpenGL2DSurface.DrawGLScene))
+        #glutDisplayFunc(memberfunctor(self, OpenGL2DSurface.DrawGLScene))
         glutFullScreen()
-        #glutIdleFunc(Surface.memberfunctor(self, OpenGL2DSurface.DrawGLScene))
-        glutReshapeFunc(Surface.memberfunctor(self,OpenGL2DSurface.ReSizeGLScene))
-        glutKeyboardFunc(Surface.memberfunctor(self,OpenGL2DSurface.keyPressed))
+        #glutIdleFunc(memberfunctor(self, OpenGL2DSurface.DrawGLScene))
+        glutReshapeFunc(memberfunctor(self,OpenGL2DSurface.ReSizeGLScene))
+        glutKeyboardFunc(memberfunctor(self,OpenGL2DSurface.keyPressed))
         InitGL(self.Width, self.Height)
 
     def StartRender(self):
-        glutTimerFunc(self.TimeMS,Surface.memberfunctor(self, OpenGL2DSurface.DrawGLScene),0)
+        glutTimerFunc(self.TimeMS,memberfunctor(self, OpenGL2DSurface.DrawGLScene),0)
         glutMainLoop()
 
     def DrawGLScene(self, *args, **kwargs):
-        glutTimerFunc(self.TimeMS,Surface.memberfunctor(self, OpenGL2DSurface.DrawGLScene),0)
+        glutTimerFunc(self.TimeMS,memberfunctor(self, OpenGL2DSurface.DrawGLScene),0)
         now=datetime.datetime.now()
         timediff=now-self.LastRender.pop()
         self.LastRender.insert(0,now)
