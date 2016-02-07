@@ -91,6 +91,7 @@ class Creature(Sphere): # one cell, spheric (for now)
                     self.NeuronY.Inputs[0]=0.0
                     self.NeuronC.Inputs[0]=0.0
                     self.NeuronS.Inputs[0]=0.0
+                    self.NeuronP.Inputs[0]=0.0
 
 
     class Motor(Organ):
@@ -136,10 +137,12 @@ class Creature(Sphere): # one cell, spheric (for now)
         #Synapsis(ix,oy,0.0)
         #Synapsis(iy,ox,0.0)
         #Synapsis(iy,oy,1.0)
-        self.Brain.HiddenLayers.append(NeuronLayer())
-        nhn=np.random.randint(3,11)
-        for i in range(0,nhn):
-            self.Brain.HiddenLayers[0].Neurons.append(HiddenNeuron())
+        nhl=np.random.randint(3,9)
+        for i in range(0,nhl):
+            self.Brain.HiddenLayers.append(NeuronLayer())
+            nhn=np.random.randint(8,17)
+            for j in range(0,nhn):
+                self.Brain.HiddenLayers[i].Neurons.append(HiddenNeuron())
         self.Brain.FillSynapsisGraph()
 
     def UpdateInputs(self,o):
