@@ -58,8 +58,8 @@ class Sphere(Object):
         #might be better to store prev pos, than acceleration
 
     def Physics(self, dT: float):
-        #self.Eulerish(dT)
-        self.RK4(dT)
+        self.Eulerish(dT)
+        #self.RK4(dT)
 
     def Eulerish(self, dT: float):
         ad=Vector3D(0.0,0.0,0.0)
@@ -77,6 +77,7 @@ class Sphere(Object):
             ad+=-1*c[1]*(abs(self.Vel)**c[0])*self.Vel
         ad/=self.Mass
         self.Acc+=ad
+        # acceleration should be computed again in the steps
         k1=(dT*self.Vel,dT*self.Acc)
         k2=(dT*(self.Vel+0.5*k1[0]),dT*(self.Acc+0.5*k1[1]))
         k3=(dT*(self.Vel+0.5*k2[0]),dT*(self.Acc+0.5*k2[1]))

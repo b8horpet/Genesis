@@ -1,5 +1,7 @@
 Improving numerical precision:
 - RK4
+  - should recompute acceleration in steps
+  - should query that from the world
 - adaptive steps
 - Richardson Extrapolation and the Bulirsch-Stoer Method
 - ???
