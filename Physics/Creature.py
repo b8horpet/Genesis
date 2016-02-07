@@ -36,6 +36,8 @@ class Creature(Sphere): # one cell, spheric (for now)
             self.Parent.Brain.RegisterNeuron(self.NeuronX)
             self.NeuronY=InputNeuron()
             self.Parent.Brain.RegisterNeuron(self.NeuronY)
+            self.NeuronP=InputNeuron()
+            self.Parent.Brain.RegisterNeuron(self.NeuronP)
             self.NeuronC=InputNeuron()
             self.Parent.Brain.RegisterNeuron(self.NeuronC)
             self.NeuronS=InputNeuron()
@@ -77,6 +79,7 @@ class Creature(Sphere): # one cell, spheric (for now)
                     d.Normalize()
                     self.NeuronX.Inputs[0]=d.x
                     self.NeuronY.Inputs[0]=d.y
+                    self.NeuronP.Inputs[0]=10/(1+self.Dist)
                     cavg=self.Color[0]+self.Color[1]+self.Color[2]
                     cavg*=2/3.0
                     cavg-=1.0

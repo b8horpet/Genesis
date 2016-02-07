@@ -11,7 +11,8 @@ class Neuron(NeuralObjectInterface):
         self.Output = 0.0
         self.Sum = 0.0
         self.eps=0.0
-        self.TransferFilter = LinearFilter()
+        self.TransferFilter = TangentHyperbolic()
+#        self.TransferFilter = LinearFilter()
 #        self.TransferFilter = LinearSlabFilter
         Synapsis(ConstantOne, self, 0.0)
 
