@@ -22,12 +22,53 @@ class Creature(Sphere): # one cell, spheric (for now)
         def Activate(self):
             pass
 
+        def IsInput(self):
+            return False
+
+        def IsOutput(self):
+            return False
+
     class Sensor(Organ):
-        def __init__(self,p,nx,ny):
+        def __init__(self,p):
             super(Creature.Sensor,self).__init__(p)
-            self.NeuronX=nx
-            self.NeuronY=ny
+            self.Radius=10.0
+            self.NeuronX=InputNeuron()
+            self.Parent.Brain.RegisterNeuron(self.NeuronX)
+            self.NeuronY=InputNeuron()
+            self.Parent.Brain.RegisterNeuron(self.NeuronY)
+            self.NeuronC=InputNeuron()
+            self.Parent.Brain.RegisterNeuron(self.NeuronC)
+            self.NeuronS=InputNeuron()
+            self.Parent.Brain.RegisterNeuron(self.NeuronS)
             self.Pos=None
+            self.Dist=0.0
+            self.Color=(0,0,0,0)
+            self.Size=0.0
+
+        def IsInput(self):
+            return True
+
+        def Reset(self):
+            self.Pos=None
+            self.Dist=0.0
+            self.Color=(0,0,0,0)
+            self.Size=0.0
+
+        def UpdateTarget(self,o):
+            if o == None:
+                self.Reset()
+                return
+            rad_sum=self.Radius+o.Radius
+            pos_diff=self.Parent.Pos-o.Pos
+            if abs(pos_diff.x) > rad_sum or abs(pos_diff.y) > rad_sum:
+                return
+            pd2=pos_diff*pos_diff
+            if pd2 < rad_sum**2:
+                if self.Pos == None or self.Dist*self.Dist>pd2:
+                    self.Pos=o.Pos
+                    self.Dist=np.sqrt(pd2)
+                    self.Color=o.Color
+                    self.Size=o.Radius
 
         def Activate(self):
             if self.Parent.Energy > 0.0 and self.Parent.Health > 0.0:
@@ -36,14 +77,29 @@ class Creature(Sphere): # one cell, spheric (for now)
                     d.Normalize()
                     self.NeuronX.Inputs[0]=d.x
                     self.NeuronY.Inputs[0]=d.y
-                    self.Pos=None
-                self.Parent.Energy-=0.05
+                    cavg=self.Color[0]+self.Color[1]+self.Color[2]
+                    cavg*=2/3.0
+                    cavg-=1.0
+                    self.NeuronC.Inputs[0]=cavg
+                    self.NeuronS.Inputs[0]=self.Size
+                    self.Parent.Energy-=0.05
+                else:
+                    self.NeuronX.Inputs[0]=0.0
+                    self.NeuronY.Inputs[0]=0.0
+                    self.NeuronC.Inputs[0]=0.0
+                    self.NeuronS.Inputs[0]=0.0
+
 
     class Motor(Organ):
-        def __init__(self,p,nx,ny):
+        def __init__(self,p):
             super(Creature.Motor,self).__init__(p)
-            self.NeuronX=nx
-            self.NeuronY=ny
+            self.NeuronX=OutputNeuron()
+            self.Parent.Brain.RegisterNeuron(self.NeuronX)
+            self.NeuronY=OutputNeuron()
+            self.Parent.Brain.RegisterNeuron(self.NeuronY)
+
+        def IsOutput(self):
+            return True
 
         def Activate(self):
             if self.Parent.Energy > 0.0 and self.Parent.Health > 0.0:
@@ -52,27 +108,41 @@ class Creature(Sphere): # one cell, spheric (for now)
                 for f in self.Parent.Frics:
                     self.Parent.Energy-=f*0.2
 
+
+
     def __init__(self):
         super(Creature,self).__init__()
         self.Energy=1000.0
         self.Health=100.0
         self.Color=(np.random.uniform(0.0,0.3),np.random.uniform(0.2,0.8),np.random.uniform(0.0,0.3),1)
+        self.Brain=None
+        self.Organs=[]
+        self.SetupBrain()
+
+    def SetupBrain(self):
         self.Brain=Brain()
-        ix=InputNeuron()
-        iy=InputNeuron()
-        ox=OutputNeuron()
-        oy=OutputNeuron()
-        self.Brain.InputLayer.Neurons.append(ix)
-        self.Brain.InputLayer.Neurons.append(iy)
-        self.Brain.OutputLayer.Neurons.append(ox)
-        self.Brain.OutputLayer.Neurons.append(oy)
-        Synapsis(ix,ox,1.0)
-        Synapsis(ix,oy,0.0)
-        Synapsis(iy,ox,0.0)
-        Synapsis(iy,oy,1.0)
-        s=Creature.Sensor(self,ix,iy)
-        m=Creature.Motor(self,ox,oy)
-        self.Organs=[s,m]
+        s=Creature.Sensor(self)
+        m=Creature.Motor(self)
+        self.Organs.append(s)
+        self.Organs.append(m)
+        #ix=self.Brain.InputLayer.Neurons[0]
+        #iy=self.Brain.InputLayer.Neurons[1]
+        #ox=self.Brain.OutputLayer.Neurons[0]
+        #oy=self.Brain.OutputLayer.Neurons[1]
+        #Synapsis(ix,ox,1.0)
+        #Synapsis(ix,oy,0.0)
+        #Synapsis(iy,ox,0.0)
+        #Synapsis(iy,oy,1.0)
+        self.Brain.HiddenLayers.append(NeuronLayer())
+        nhn=np.random.randint(3,11)
+        for i in range(0,nhn):
+            self.Brain.HiddenLayers[0].Neurons.append(HiddenNeuron())
+        self.Brain.FillSynapsisGraph()
+
+    def UpdateInputs(self,o):
+        for i in self.Organs:
+            if i.IsInput():
+                i.UpdateTarget(o)
 
     def Physics(self, dT: float):
         for o in self.Organs:

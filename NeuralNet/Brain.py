@@ -2,6 +2,8 @@
 
 
 from NeuralNet.Common import *
+from NeuralNet.Neuron import *
+import numpy as np
 
 
 class NeuronLayer(NeuralObjectInterface):
@@ -28,6 +30,32 @@ class Brain(NeuralObjectInterface):
 
     def __del__(self):
         pass
+
+    def RegisterNeuron(self, n):
+        if type(n)==InputNeuron:
+            self.InputLayer.Neurons.append(n)
+        elif type(n)==OutputNeuron:
+            self.OutputLayer.Neurons.append(n)
+        else:
+            raise Exception() #wtf?
+
+    def FillSynapsisGraph(self):
+        l=len(self.HiddenLayers)
+        if l>0:
+            for i in self.InputLayer.Neurons:
+                for o in self.HiddenLayers[0].Neurons:
+                    Synapsis(i,o,np.random.uniform(-1,1))
+            for h in range(0,l-1):
+                for i in self.HiddenLayers[h].Neurons:
+                    for o in self.HiddenLayers[h+1].Neurons:
+                        Synapsis(i,o,np.random.uniform(-1,1))
+            for i in self.HiddenLayers[l-1].Neurons:
+                for o in self.OutputLayer.Neurons:
+                    Synapsis(i,o,np.random.uniform(-1,1))
+        else:
+            for i in self.InputLayer.Neurons:
+                for o in self.OutputLayer.Neurons:
+                    Synapsis(i,o,np.random.uniform(-1,1))
 
     def Activate(self):
         self.InputLayer.Activate()

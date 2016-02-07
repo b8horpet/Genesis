@@ -133,21 +133,18 @@ class World:
 
     def Logic(self):
         for c in self.Creatures:
-            ps=c.Pos
-            mx=100.0
+            c.UpdateInputs(None)
             for oj in self.Objects:
                 if c is oj:
                     continue
-                if abs(ps-oj.Pos)<mx:
-                    mx=abs(ps-oj.Pos)
-                    c.Organs[0].Pos=oj.Pos
+                c.UpdateInputs(oj)
             c.Logic()
 
     def Spawn(self):
         if len(self.Objects)<self.ObjLimit:
             r=np.random.uniform(0.0,100.0)
             if r < 10:
-                if r < 0.5:
+                if r < 0.25:
                     o=Creature()
                 else:
                     o=Food()
