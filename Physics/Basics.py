@@ -1,7 +1,7 @@
 #author: b8horpet
 
 
-import math
+import numpy as np
 DEBUG=False
 PROFILE=False
 
@@ -58,7 +58,7 @@ class Vector2D:
         raise NotImplementedError()
 
     def __abs__(self):
-        return math.sqrt(self * self)
+        return np.sqrt(self * self)
 
     def __len__(self):
         return 2
@@ -138,3 +138,7 @@ class Vector3D(Vector2D):
         self.y/=l
         self.z/=l
         return self
+
+
+PhysicsRandom=np.random.RandomState()
+

@@ -118,7 +118,7 @@ class Creature(Sphere): # one cell, spheric (for now)
         super(Creature,self).__init__()
         self.Energy=1000.0
         self.Health=100.0
-        self.Color=(np.random.uniform(0.0,0.3),np.random.uniform(0.2,0.8),np.random.uniform(0.0,0.3),1)
+        self.Color=(PhysicsRandom.uniform(0.0, 0.3), PhysicsRandom.uniform(0.2, 0.8), PhysicsRandom.uniform(0.0, 0.3), 1)
         self.Brain=None
         self.Organs=[]
         self.SetupBrain()
@@ -137,10 +137,10 @@ class Creature(Sphere): # one cell, spheric (for now)
         #Synapsis(ix,oy,0.0)
         #Synapsis(iy,ox,0.0)
         #Synapsis(iy,oy,1.0)
-        nhl=np.random.randint(3,9)
+        nhl=NeuralRandom.randint(3,9)
         for i in range(0,nhl):
             self.Brain.HiddenLayers.append(NeuronLayer())
-            nhn=np.random.randint(8,17)
+            nhn=NeuralRandom.randint(8,17)
             for j in range(0,nhn):
                 self.Brain.HiddenLayers[i].Neurons.append(HiddenNeuron())
         self.Brain.FillSynapsisGraph()

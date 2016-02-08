@@ -99,6 +99,8 @@ class World:
         self.Size=25.0
         self.TickCnt=0
         self.Geometry = World.Geometry()
+        PhysicsRandom.seed(0)
+        NeuralRandom.seed(0xb8)
         if DEBUG:
             self.tkp=None
             self.dtkp=None
@@ -142,13 +144,13 @@ class World:
 
     def Spawn(self):
         if len(self.Objects)<self.ObjLimit:
-            r=np.random.uniform(0.0,100.0)
+            r=PhysicsRandom.uniform(0.0, 100.0)
             if r < 10:
                 if r < 0.25:
                     o=Creature()
                 else:
                     o=Food()
-                o.Pos=Vector3D(np.random.uniform(-self.Size,self.Size),np.random.uniform(-self.Size,self.Size))
+                o.Pos=Vector3D(PhysicsRandom.uniform(-self.Size, self.Size), PhysicsRandom.uniform(-self.Size, self.Size))
                 self.AddObject(o)
 
 

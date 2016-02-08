@@ -2,6 +2,7 @@
 
 
 from NeuralNet.Functions import *
+import numpy as np
 
 
 class NeuralObjectInterface:
@@ -16,3 +17,5 @@ class NeuralObjectInterface:
 
     def Propagate(self):
         raise NotImplementedError()
+
+NeuralRandom=np.random.RandomState()

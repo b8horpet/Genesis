@@ -44,18 +44,18 @@ class Brain(NeuralObjectInterface):
         if l>0:
             for i in self.InputLayer.Neurons:
                 for o in self.HiddenLayers[0].Neurons:
-                    Synapsis(i,o,np.random.uniform(-1,1))
+                    Synapsis(i,o,NeuralRandom.uniform(-1,1))
             for h in range(0,l-1):
                 for i in self.HiddenLayers[h].Neurons:
                     for o in self.HiddenLayers[h+1].Neurons:
-                        Synapsis(i,o,np.random.uniform(-1,1))
+                        Synapsis(i,o,NeuralRandom.uniform(-1,1))
             for i in self.HiddenLayers[l-1].Neurons:
                 for o in self.OutputLayer.Neurons:
-                    Synapsis(i,o,np.random.uniform(-1,1))
+                    Synapsis(i,o,NeuralRandom.uniform(-1,1))
         else:
             for i in self.InputLayer.Neurons:
                 for o in self.OutputLayer.Neurons:
-                    Synapsis(i,o,np.random.uniform(-1,1))
+                    Synapsis(i,o,NeuralRandom.uniform(-1,1))
 
     def Activate(self):
         self.InputLayer.Activate()
