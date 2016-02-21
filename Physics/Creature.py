@@ -189,7 +189,8 @@ class Creature(Sphere): # one cell, spheric (for now)
             else:
                 pass # they are soft, do not deal damage from collision
         else:
-            self.Health-=1.0 # hm, haven't thought of this
+            pass
+            #self.Health-=1.0 # hm, haven't thought of this
         return e
 
     def Logic(self):
@@ -226,4 +227,19 @@ class Food(Sphere):
                 e.dE=self.Nutrient
                 self.Nutrient=0.0
                 self.Alive=False
+        return e
+
+class Obstacle(Sphere):
+    def __init__(self):
+        super(Obstacle,self).__init__()
+        self.Damage=10.0
+        self.Radius=3.0
+        self.Mass=10.0
+        self.Color=(0.2,0.2,0.2,1)
+
+    def DoCollision(self, other):
+        e=Creature.Interact(super(Obstacle,self).DoCollision(other))
+        if type(other) == Creature:
+            if other.Health > 0.0:
+                e.dH=-self.Damage
         return e

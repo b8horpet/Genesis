@@ -7,6 +7,7 @@ from Physics.Basics import *
 from Physics.Object import *
 from Physics.Creature import *
 import cProfile, pstats
+import pickle
 
 
 def ConstantFrics(p: Vector3D) -> float:
@@ -99,8 +100,6 @@ class World:
         self.Size=25.0
         self.TickCnt=0
         self.Geometry = World.Geometry()
-        PhysicsRandom.seed(0)
-        NeuralRandom.seed(0xb8)
         if DEBUG:
             self.tkp=None
             self.dtkp=None
@@ -146,10 +145,7 @@ class World:
         if len(self.Objects)<self.ObjLimit:
             r=PhysicsRandom.uniform(0.0, 100.0)
             if r < 10:
-                if r < 0.25:
-                    o=Creature()
-                else:
-                    o=Food()
+                o=Food()
                 o.Pos=Vector3D(PhysicsRandom.uniform(-self.Size, self.Size), PhysicsRandom.uniform(-self.Size, self.Size))
                 self.AddObject(o)
 
@@ -163,6 +159,12 @@ class World:
             self.Physics(0.01)
             if self.TickCnt == 0:
                 self.Logic()
+
+    def Dump(self):
+        l=[]
+        for o in self.Objects:
+            l.append((type(o),o.Pos.x,o.Pos.y))
+        return pickle.dumps(l)
 
     def GetRenderData(self):
         if PROFILE:
