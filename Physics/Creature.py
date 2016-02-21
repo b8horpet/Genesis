@@ -73,7 +73,7 @@ class Creature(Sphere): # one cell, spheric (for now)
                     self.Size=o.Radius
 
         def Activate(self):
-            if self.Parent.Energy > 0.0 and self.Parent.Health > 0.0:
+            if self.Parent.IsAlive():
                 if self.Pos != None:
                     d=self.Parent.Pos-self.Pos
                     d.Normalize()
@@ -106,7 +106,7 @@ class Creature(Sphere): # one cell, spheric (for now)
             return True
 
         def Activate(self):
-            if self.Parent.Energy > 0.0 and self.Parent.Health > 0.0:
+            if self.Parent.IsAlive():
                 self.Parent.Acc.x-=self.NeuronX.Output
                 self.Parent.Acc.y-=self.NeuronY.Output
                 for f in self.Parent.Frics:
@@ -116,7 +116,7 @@ class Creature(Sphere): # one cell, spheric (for now)
 
     def __init__(self):
         super(Creature,self).__init__()
-        self.Energy=1000.0
+        self.Energy=300.0
         self.Health=100.0
         self.Color=(PhysicsRandom.uniform(0.0, 0.3), PhysicsRandom.uniform(0.2, 0.8), PhysicsRandom.uniform(0.0, 0.3), 1)
         self.Brain=None
@@ -137,13 +137,27 @@ class Creature(Sphere): # one cell, spheric (for now)
         #Synapsis(ix,oy,0.0)
         #Synapsis(iy,ox,0.0)
         #Synapsis(iy,oy,1.0)
-        nhl=NeuralRandom.randint(3,9)
+
+        #nhl=NeuralRandom.randint(3,9)
+        nhl=2
         for i in range(0,nhl):
             self.Brain.HiddenLayers.append(NeuronLayer())
-            nhn=NeuralRandom.randint(8,17)
+            #nhn=NeuralRandom.randint(8,17)
+            nhn=10
             for j in range(0,nhn):
                 self.Brain.HiddenLayers[i].Neurons.append(HiddenNeuron())
         self.Brain.FillSynapsisGraph()
+
+    def InheritGenom(self, parents):
+        for i,hl in enumerate(self.Brain.HiddenLayers):
+            for j,hn in enumerate(hl.Neurons):
+                for k,s in enumerate(hn.Inputs):
+                    p=NeuralRandom.choice(parents)
+                    s.Weight=p.Brain.HiddenLayers[i].Neurons[j].Inputs[k].Weight
+        for j,hn in enumerate(self.Brain.OutputLayer.Neurons):
+            for k,s in enumerate(hn.Inputs):
+                p=NeuralRandom.choice(parents)
+                s.Weight=p.Brain.OutputLayer.Neurons[j].Inputs[k].Weight
 
     def UpdateInputs(self,o):
         for i in self.Organs:
@@ -176,13 +190,13 @@ class Creature(Sphere): # one cell, spheric (for now)
             pass # food does the job
         elif type(other) == Creature:
             if other.Health <= 0.0:
-                if self.Energy > 0.0 and self.Health > 0.0:
+                if self.IsAlive():
                     e.dE-=other.Energy
                     e.Kill=True
             elif other.Energy > 0.0:
                 e.dE-=5.0
             if self.Health <= 0.0:
-                if other.Energy > 0.0 and other.Health > 0.0:
+                if other.IsAlive():
                     e.dE+=self.Energy/10
             elif self.Energy > 0.0:
                 e.dH-=self.Energy/100 # and they bite
@@ -194,7 +208,7 @@ class Creature(Sphere): # one cell, spheric (for now)
         return e
 
     def Logic(self):
-        if self.Energy > 0.0 and self.Health > 0.0:
+        if self.IsAlive():
             self.Brain.Activate()
             self.Energy-=0.05
 
@@ -204,6 +218,9 @@ class Creature(Sphere): # one cell, spheric (for now)
         if e.Kill:
             self.Alive=False
         super(Creature,self).DoEffect(e)
+
+    def IsAlive(self):
+        return self.Health>0.0 and self.Energy>0.0
 
 
 class Food(Sphere):
@@ -223,7 +240,7 @@ class Food(Sphere):
     def DoCollision(self, other):
         e=Creature.Interact(super(Food,self).DoCollision(other))
         if type(other) == Creature:
-            if other.Health > 0.0 and other.Energy > 0.0:
+            if other.IsAlive():
                 e.dE=self.Nutrient
                 self.Nutrient=0.0
                 self.Alive=False
