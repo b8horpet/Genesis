@@ -114,12 +114,18 @@ class Creature(Sphere): # one cell, spheric (for now)
 
 
 
-    def __init__(self, color):
+    def __init__(self):
         super(Creature,self).__init__()
+
+        # seed or random may have to come from outside later
+        self.Random = np.random.RandomState(seed=self.ID)
 
         self.Energy=300.0
         self.Health=100.0
-        self.Color=color
+        self.Color=(self.Random.uniform(0.0, 0.3),
+                    self.Random.uniform(0.2, 0.8),
+                    self.Random.uniform(0.0, 0.3),
+                    1)
         self.Brain=None
         self.Organs=[]
         self.SetupBrain()
@@ -139,26 +145,13 @@ class Creature(Sphere): # one cell, spheric (for now)
         #Synapsis(iy,ox,0.0)
         #Synapsis(iy,oy,1.0)
 
-        #nhl=NeuralRandom.randint(3,9)
         nhl=2
         for i in range(0,nhl):
             self.Brain.HiddenLayers.append(NeuronLayer())
-            #nhn=NeuralRandom.randint(8,17)
             nhn=10
             for j in range(0,nhn):
                 self.Brain.HiddenLayers[i].Neurons.append(HiddenNeuron())
-        self.Brain.FillSynapsisGraph()
-
-    def InheritGenom(self, parents):
-        for i,hl in enumerate(self.Brain.HiddenLayers):
-            for j,hn in enumerate(hl.Neurons):
-                for k,s in enumerate(hn.Inputs):
-                    p=NeuralRandom.choice(parents)
-                    s.Weight=p.Brain.HiddenLayers[i].Neurons[j].Inputs[k].Weight
-        for j,hn in enumerate(self.Brain.OutputLayer.Neurons):
-            for k,s in enumerate(hn.Inputs):
-                p=NeuralRandom.choice(parents)
-                s.Weight=p.Brain.OutputLayer.Neurons[j].Inputs[k].Weight
+        self.Brain.FillSynapsisGraph(self.Random)
 
     def UpdateInputs(self,o):
         for i in self.Organs:

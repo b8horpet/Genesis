@@ -17,5 +17,3 @@ class NeuralObjectInterface:
 
     def Propagate(self):
         raise NotImplementedError()
-
-NeuralRandom=np.random.RandomState()

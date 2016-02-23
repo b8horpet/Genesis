@@ -6,35 +6,50 @@ import Graphics
 import numpy as np
 import pickle
 
-GlobalRandom=np.random.RandomState()
-GlobalRandom.seed(0)
-def WeightedChoice(l):
-    total = sum(x[0] for x in l)
-    r=GlobalRandom.uniform(0,total)
-    for n, i in enumerate(l):
-        if total-i[0] < r:
-            return n
-        total-=i[0]
-    print("omg")
+# Crossover must always happn synchronized, thus, using
+# a global random state does not affect determinism.
+EvolutionRandom=np.random.RandomState(seed=0)
+
+def SelectParents(possibleParents):
+    def WeightedChoice(weights):
+        totalWeights = sum(weights)
+        r = EvolutionRandom.uniform(0, totalWeights)
+        for i, p in enumerate(weights):
+            if totalWeights - p < r:
+                return i
+            totalWeights -= p
+        assert(False)
+
+    weights = list(p[0] for p in possibleParents)
+    p1index=WeightedChoice(weights)
+    weights.pop(p1index)
+    p2index=WeightedChoice(weights)
+    if p2index>=p1index:
+        p2index+=1
+    return p1index, p2index
+
+def CrossoverBrains(creature, parents):
+    for i,hl in enumerate(creature.Brain.HiddenLayers):
+        for j,hn in enumerate(hl.Neurons):
+            for k,s in enumerate(hn.Inputs):
+                p=EvolutionRandom.choice(parents)
+                s.Weight=p.Brain.HiddenLayers[i].Neurons[j].Inputs[k].Weight
+    for j,hn in enumerate(creature.Brain.OutputLayer.Neurons):
+        for k,s in enumerate(hn.Inputs):
+            p=EvolutionRandom.choice(parents)
+            s.Weight=p.Brain.OutputLayer.Neurons[j].Inputs[k].Weight
 
 N=1#00
 secs=50
 C=5
 O=6
 generation=[]
-NeuralNet.NeuralRandom.seed(0)
-
-# random seed and sequence is currently irrelevant
-CreatureColorRandom = np.random.RandomState(seed=0)
-def GetRandomColor ():
-    return (CreatureColorRandom.uniform(0.0, 0.3), CreatureColorRandom.uniform(0.2, 0.8), CreatureColorRandom.uniform(0.0, 0.3), 1)
 
 for i in range(0,C):
-    generation.append(Physics.Creature(GetRandomColor ()))
+    generation.append(Physics.Creature())
 
 for g in range(0,N):
     print("gen #%d" % (g))
-    NeuralNet.NeuralRandom.seed(g)
     for i in range(0,len(generation)):
         worldRandom = np.random.RandomState(seed=0)
         theWorld=Physics.World(worldRandom)
@@ -62,19 +77,19 @@ for g in range(0,N):
         #    pickle.dump(Log,f)
     for i in range(0,len(generation)):
         print("#%d fittness= %f" % (i,generation[i].Fittness))
+
     # create the next generation
-    nextgen=[Physics.Creature(GetRandomColor ()) for i in range(0,C)]
+    nextgen=[Physics.Creature() for i in range(0,C)]
     
-    for i in nextgen:
+    for nextCreature in nextgen:
         parentgen = [(g.Fittness, g) for g in generation]
-        p1index=WeightedChoice(parentgen)
-        p1 = parentgen.pop(p1index)
-        p2index=WeightedChoice(parentgen)
-        p2 = parentgen[p2index]
-        if p2index>=p1index:
-            p2index+=1
+        p1index, p2index = SelectParents (parentgen)
         print((p1index,p2index))
-        i.InheritGenom([p1[1], p2[1]])
+
+        p1 = parentgen[p1index][1]
+        p2 = parentgen[p2index][1]
+        CrossoverBrains(nextCreature, [p1, p2])
+    
     generation=nextgen
 
 #s=Graphics.Surface2D.OpenGL.OpenGL2DSurface(Physics.memberfunctor(theWorld, Physics.World.GetRenderData))
