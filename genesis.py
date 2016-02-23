@@ -8,7 +8,7 @@ import pickle
 
 # Crossover must always happn synchronized, thus, using
 # a global random state does not affect determinism.
-EvolutionRandom=np.random.RandomState(seed=0)
+EvolutionRandom = np.random.RandomState(seed=0)
 
 def SelectParents(possibleParents):
     def WeightedChoice(weights):
@@ -39,23 +39,21 @@ def CrossoverBrains(creature, parents):
             p=EvolutionRandom.choice(parents)
             s.Weight=p.Brain.OutputLayer.Neurons[j].Inputs[k].Weight
 
-N=1#00
+GenerationCount=1#00
 secs=50
-C=5
-O=6
-generation=[]
+CreatureCount=5
+ObstacleCount=6
 
-for i in range(0,C):
-    generation.append(Physics.Creature())
+generation=[Physics.Creature() for i in range(0, CreatureCount)]
 
-for g in range(0,N):
+for g in range(0, GenerationCount):
     print("gen #%d" % (g))
     for i in range(0,len(generation)):
         worldRandom = np.random.RandomState(seed=0)
         theWorld=Physics.World(worldRandom)
-        for o in range(0,O):
+        for o in range(0, ObstacleCount):
             obs=Physics.Obstacle()
-            alpha=np.pi*2*o/O
+            alpha=np.pi * 2 * o / ObstacleCount
             dist=worldRandom.uniform(10,20)
             obs.Pos.x=np.cos(alpha)*dist
             obs.Pos.y=np.sin(alpha)*dist
@@ -75,11 +73,11 @@ for g in range(0,N):
             generation[i].Fittness=secs+(generation[i].Health+1)*(generation[i].Energy+1)
         #with open("run_%d_%d.dat" % (g,i),"wb") as f:
         #    pickle.dump(Log,f)
-    for i in range(0,len(generation)):
+    for i in range(0, CreatureCount):
         print("#%d fittness= %f" % (i,generation[i].Fittness))
 
     # create the next generation
-    nextgen=[Physics.Creature() for i in range(0,C)]
+    nextgen=[Physics.Creature() for i in range(0, CreatureCount)]
     
     for nextCreature in nextgen:
         parentgen = [(g.Fittness, g) for g in generation]
