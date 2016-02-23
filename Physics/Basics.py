@@ -138,7 +138,3 @@ class Vector3D(Vector2D):
         self.y/=l
         self.z/=l
         return self
-
-
-PhysicsRandom=np.random.RandomState()
-

@@ -114,11 +114,12 @@ class Creature(Sphere): # one cell, spheric (for now)
 
 
 
-    def __init__(self):
+    def __init__(self, color):
         super(Creature,self).__init__()
+
         self.Energy=300.0
         self.Health=100.0
-        self.Color=(PhysicsRandom.uniform(0.0, 0.3), PhysicsRandom.uniform(0.2, 0.8), PhysicsRandom.uniform(0.0, 0.3), 1)
+        self.Color=color
         self.Brain=None
         self.Organs=[]
         self.SetupBrain()

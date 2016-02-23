@@ -17,24 +17,31 @@ def WeightedChoice(l):
         total-=i[0]
     print("omg")
 
-N=2#00
-secs=150
+N=1#00
+secs=50
 C=5
 O=6
 generation=[]
 NeuralNet.NeuralRandom.seed(0)
+
+# random seed and sequence is currently irrelevant
+CreatureColorRandom = np.random.RandomState(seed=0)
+def GetRandomColor ():
+    return (CreatureColorRandom.uniform(0.0, 0.3), CreatureColorRandom.uniform(0.2, 0.8), CreatureColorRandom.uniform(0.0, 0.3), 1)
+
 for i in range(0,C):
-    generation.append(Physics.Creature())
+    generation.append(Physics.Creature(GetRandomColor ()))
+
 for g in range(0,N):
     print("gen #%d" % (g))
     NeuralNet.NeuralRandom.seed(g)
     for i in range(0,len(generation)):
-        theWorld=Physics.World()
-        Physics.PhysicsRandom.seed(0) # same world for everyone
+        worldRandom = np.random.RandomState(seed=0)
+        theWorld=Physics.World(worldRandom)
         for o in range(0,O):
             obs=Physics.Obstacle()
             alpha=np.pi*2*o/O
-            dist=Physics.PhysicsRandom.uniform(10,20)
+            dist=worldRandom.uniform(10,20)
             obs.Pos.x=np.cos(alpha)*dist
             obs.Pos.y=np.sin(alpha)*dist
             theWorld.AddObject(obs)
@@ -56,7 +63,7 @@ for g in range(0,N):
     for i in range(0,len(generation)):
         print("#%d fittness= %f" % (i,generation[i].Fittness))
     # create the next generation
-    nextgen=[Physics.Creature() for i in range(0,C)]
+    nextgen=[Physics.Creature(GetRandomColor ()) for i in range(0,C)]
     
     for i in nextgen:
         parentgen = [(g.Fittness, g) for g in generation]

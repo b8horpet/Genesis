@@ -90,10 +90,12 @@ class World:
 
 
 
-    def __init__(self):
+    def __init__(self, random):
         """
         ... and the programmer called the constructor, and there was World
         """
+
+        self.Random = random
         self.Objects = []
         self.Creatures = []
         self.ObjLimit=50
@@ -143,10 +145,10 @@ class World:
 
     def Spawn(self):
         if len(self.Objects)<self.ObjLimit:
-            r=PhysicsRandom.uniform(0.0, 100.0)
+            r=self.Random.uniform(0.0, 100.0)
             if r < 10:
                 o=Food()
-                o.Pos=Vector3D(PhysicsRandom.uniform(-self.Size, self.Size), PhysicsRandom.uniform(-self.Size, self.Size))
+                o.Pos=Vector3D(self.Random.uniform(-self.Size, self.Size), self.Random.uniform(-self.Size, self.Size))
                 self.AddObject(o)
 
 
