@@ -10,7 +10,7 @@ import pickle
 # a global random state does not affect determinism.
 EvolutionRandom = np.random.RandomState(seed=0)
 
-def SelectParents(possibleParents):
+def SelectParents(possibleParentsFittnesses):
     def WeightedChoice(weights):
         totalWeights = sum(weights)
         r = EvolutionRandom.uniform(0, totalWeights)
@@ -20,7 +20,7 @@ def SelectParents(possibleParents):
             totalWeights -= p
         assert(False)
 
-    weights = list(p[0] for p in possibleParents)
+    weights = list(possibleParentsFittnesses)
     p1index=WeightedChoice(weights)
     weights.pop(p1index)
     p2index=WeightedChoice(weights)
@@ -39,60 +39,75 @@ def CrossoverBrains(creature, parents):
             p=EvolutionRandom.choice(parents)
             s.Weight=p.Brain.OutputLayer.Neurons[j].Inputs[k].Weight
 
-GenerationCount=1#00
-secs=50
-CreatureCount=5
-ObstacleCount=6
 
-generation=[Physics.Creature() for i in range(0, CreatureCount)]
+def CreateUniverse(creature):
+    """
+    Universe is an ordered pair of a world and a creature
+    where the creature is also added to the world.
+    """
 
-for g in range(0, GenerationCount):
-    print("gen #%d" % (g))
-    for i in range(0,len(generation)):
-        worldRandom = np.random.RandomState(seed=0)
-        theWorld=Physics.World(worldRandom)
-        for o in range(0, ObstacleCount):
-            obs=Physics.Obstacle()
-            alpha=np.pi * 2 * o / ObstacleCount
-            dist=worldRandom.uniform(10,20)
-            obs.Pos.x=np.cos(alpha)*dist
-            obs.Pos.y=np.sin(alpha)*dist
-            theWorld.AddObject(obs)
-        print(i)
-        theWorld.AddObject(generation[i])
-        #Log=[theWorld.Dump()]
+    worldRandom = np.random.RandomState(seed=0)
 
-        for t in range(0,secs*20):
-            theWorld.Activate()
-            #Log.append(theWorld.Dump())
-            if not generation[i].IsAlive():
-                print("dead")
-                generation[i].Fittness=t/20
-                break
-        if generation[i].IsAlive():
-            generation[i].Fittness=secs+(generation[i].Health+1)*(generation[i].Energy+1)
-        #with open("run_%d_%d.dat" % (g,i),"wb") as f:
-        #    pickle.dump(Log,f)
-    for i in range(0, CreatureCount):
-        print("#%d fittness= %f" % (i,generation[i].Fittness))
-
-    # create the next generation
-    nextgen=[Physics.Creature() for i in range(0, CreatureCount)]
+    world=Physics.World(worldRandom)
+    for o in range(0, ObstacleCount):
+        obs=Physics.Obstacle()
+        alpha=np.pi * 2 * o / ObstacleCount
+        dist=worldRandom.uniform(10,20)
+        obs.Pos.x=np.cos(alpha)*dist
+        obs.Pos.y=np.sin(alpha)*dist
+        world.AddObject(obs)
     
-    for nextCreature in nextgen:
-        parentgen = [(g.Fittness, g) for g in generation]
-        p1index, p2index = SelectParents (parentgen)
-        print((p1index,p2index))
+    world.AddObject(creature)
 
-        p1 = parentgen[p1index][1]
-        p2 = parentgen[p2index][1]
-        CrossoverBrains(nextCreature, [p1, p2])
-    
-    generation=nextgen
+    return (world, creature)
 
-#s=Graphics.Surface2D.OpenGL.OpenGL2DSurface(Physics.memberfunctor(theWorld, Physics.World.GetRenderData))
-#s=Graphics.Surface2D.MatPlotLib.MatplotLibSurface(Physics.memberfunctor(theWorld,Physics.World.GetRenderData))
-# should be on other thread, or the physics must be on the render call
-#s.StartRender()
+if __name__ == "__main__":
+    GenerationCount=1#00
+    CreatureCount=5
+    ObstacleCount=6
+    Secs=50
 
-print("genesis project placeholder")
+    initialCreatures = [Physics.Creature () for i in range(0, CreatureCount)]
+    generation = list(map(CreateUniverse, initialCreatures))
+
+    for g in range(0, GenerationCount):
+        print("Generation #%d started" % (g))
+        for world, creature in generation:
+            for t in range(0,Secs * 20):
+                world.Activate()
+
+                if not creature.IsAlive():
+                    print ("\tCreature #%d died" % creature.ID)
+                    creature.Fittness = t / 20
+                    break
+            
+            if creature.IsAlive():
+                print ("\tCreature #%d has survived" % creature.ID)
+                creature.Fittness=Secs+(creature.Health+1)*(creature.Energy+1)
+        
+        print("Generation #%d ended" % g)
+
+        for _, creature in generation:
+            print("\tCreature #%d fittness = %f" % (creature.ID, creature.Fittness))
+
+        # create the next generation
+        print("Creating next generation")
+        nextgen = [Physics.Creature() for i in range(0, CreatureCount)]
+        for nextCreature in nextgen:
+            parentFittnesses = [c.Fittness for w, c in generation]
+            p1index, p2index = SelectParents (parentFittnesses)
+            p1 = generation[p1index][1]
+            p2 = generation[p2index][1]
+            CrossoverBrains(nextCreature, [p1, p2])
+
+            print("\t(Creature #%d, Creature #%d) -> Creature #%d" % (p1.ID, p2.ID, nextCreature.ID))
+
+        
+        generation = list(map(CreateUniverse, nextgen))
+
+    #s=Graphics.Surface2D.OpenGL.OpenGL2DSurface(Physics.memberfunctor(theWorld, Physics.World.GetRenderData))
+    #s=Graphics.Surface2D.MatPlotLib.MatplotLibSurface(Physics.memberfunctor(theWorld,Physics.World.GetRenderData))
+    # should be on other thread, or the physics must be on the render call
+    #s.StartRender()
+
+    print("Genesis ended")
