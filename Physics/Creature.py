@@ -114,21 +114,35 @@ class Creature(Sphere): # one cell, spheric (for now)
 
 
 
-    def __init__(self):
+    def __init__(self, mpParameters = None):
         super(Creature,self).__init__()
-
-        # seed or random may have to come from outside later
-        self.Random = np.random.RandomState(seed=self.ID)
 
         self.Energy=300.0
         self.Health=100.0
+        self.Organs=[]
+        self.Brain = None
+
+        self.Random = np.random.RandomState(seed=self.ID)
         self.Color=(self.Random.uniform(0.0, 0.3),
                     self.Random.uniform(0.2, 0.8),
                     self.Random.uniform(0.0, 0.3),
                     1)
-        self.Brain=None
-        self.Organs=[]
         self.SetupBrain()
+
+        if mpParameters is not None:
+            self.ID = mpParameters.id
+            self.Random = mpParameters.random
+            self.Color = mpParameters.color
+
+            # ez mar nagyon gany kezd lenni...
+            for i,hl in enumerate(self.Brain.HiddenLayers):
+                for j,hn in enumerate(hl.Neurons):
+                    for k,s in enumerate(hn.Inputs):
+                        s.Weight=mpParameters.brain.HiddenLayers[i].Neurons[j].Inputs[k].Weight
+            for j,hn in enumerate(self.Brain.OutputLayer.Neurons):
+                for k,s in enumerate(hn.Inputs):
+                    s.Weight=mpParameters.brain.OutputLayer.Neurons[j].Inputs[k].Weight
+
 
     def SetupBrain(self):
         self.Brain=Brain()

@@ -3,8 +3,11 @@ __author__ = 'b8horpet'
 import NeuralNet
 import Physics
 import Graphics
+
 import numpy as np
 import pickle
+import itertools as it
+import multiprocessing as mp
 
 # Crossover must always happn synchronized, thus, using
 # a global random state does not affect determinism.
@@ -61,34 +64,75 @@ def CreateUniverse(creature):
 
     return (world, creature)
 
-if __name__ == "__main__":
-    GenerationCount=1#00
-    CreatureCount=5
-    ObstacleCount=6
-    Secs=50
+# Global constants
+Secs=150
+GenerationCount=10#0
+CreatureCount=8
+ObstacleCount=6
 
+def SimulateOneGeneration(world, creature):
+    for t in range(0, Secs * 20):
+        world.Activate()
+        if not creature.IsAlive():
+            creature.Fittness = t / 20
+            break
+
+    if creature.IsAlive():
+        creature.Fittness=Secs+(creature.Health+1)*(creature.Energy+1)
+    return (world, creature)
+
+
+class MultiProcessingParamsForCreature(object):
+    def __init__(self, id, r, c, b):
+        self.id = id
+        self.random = r
+        self.color = c
+        self.brain = b
+
+def SimulateWrapperForMultiProcessing(params, results):
+    c = Physics.Creature(mpParameters=params)
+    u = CreateUniverse (c)
+    w, c = SimulateOneGeneration (*u)
+    results[c.ID] = c.Fittness
+
+if __name__ == "__main__":
     initialCreatures = [Physics.Creature () for i in range(0, CreatureCount)]
     generation = list(map(CreateUniverse, initialCreatures))
 
+    print()
+    print("Running simulation with global values:")
+    print("\tSecs = %d" % Secs)
+    print("\tGenerationCount = %d" % GenerationCount)
+    print("\tCreatureCount = %d" % CreatureCount)
+    print("\tObstacleCount = %d" % ObstacleCount)
+    
     for g in range(0, GenerationCount):
+        print()
         print("Generation #%d started" % (g))
-        for world, creature in generation:
-            for t in range(0,Secs * 20):
-                world.Activate()
-
-                if not creature.IsAlive():
-                    print ("\tCreature #%d died" % creature.ID)
-                    creature.Fittness = t / 20
-                    break
-            
-            if creature.IsAlive():
-                print ("\tCreature #%d has survived" % creature.ID)
-                creature.Fittness=Secs+(creature.Health+1)*(creature.Energy+1)
         
+        # Iterative solution
+        #iterativeGeneration = it.starmap(SimulateOneGeneration, generation)
+        #generation = list(iterativeGeneration)
+        
+        # Multpiprocess solution
+
+        # Default method is 'fork' on linux, 'spawn' on windows
+        # mp.set_start_method('spawn')
+        with mp.Pool() as processPool:
+            manager = mp.Manager()
+            results = manager.dict()
+
+            params = [(MultiProcessingParamsForCreature (c.ID, c.Random, c.Color, c.Brain), results) for w, c in generation]
+            processPool.starmap(SimulateWrapperForMultiProcessing, params)
+            # print(results)
+            for _, creature in generation:
+                creature.Fittness = results[creature.ID]
+
         print("Generation #%d ended" % g)
 
-        for _, creature in generation:
-            print("\tCreature #%d fittness = %f" % (creature.ID, creature.Fittness))
+        for i, (_, creature) in enumerate(generation):
+            survived = creature.Fittness > Secs
+            print("\t%d fittness = %f\t\t(Creature #%d\t%s)" % (i, creature.Fittness, creature.ID, "survived" if survived else "dead"))
 
         # create the next generation
         print("Creating next generation")
@@ -100,7 +144,8 @@ if __name__ == "__main__":
             p2 = generation[p2index][1]
             CrossoverBrains(nextCreature, [p1, p2])
 
-            print("\t(Creature #%d, Creature #%d) -> Creature #%d" % (p1.ID, p2.ID, nextCreature.ID))
+            print("\t%d x %d\t\t(Creature #%d x Creature #%d -> Creature #%d)" %
+                (p1index, p2index, p1.ID, p2.ID, nextCreature.ID))
 
         
         generation = list(map(CreateUniverse, nextgen))
