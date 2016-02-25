@@ -14,6 +14,8 @@ import datetime
 circle_ang=36
 circle_temp=tuple([Vector2D(np.cos(i*np.pi*2/circle_ang),np.sin(i*np.pi*2/circle_ang)) for i in range(0,circle_ang)])
 
+#def foo(*args,**kwargs):
+#    pass
 
 class Keys(Enum):
     Escape = b'\x1b'
@@ -31,9 +33,9 @@ class Keys(Enum):
 def InitGL(Width, Height):
     glClearColor(0.0, 0.0, 0.0, 0.0)
     glClearDepth(1.0)
-    #glDepthFunc(GL_LESS)
-    #glEnable(GL_DEPTH_TEST)
-    glEnable(GL_DEPTH_CLAMP)
+    glDepthFunc(GL_LESS)
+    glEnable(GL_DEPTH_TEST)
+    #glEnable(GL_DEPTH_CLAMP)
     glShadeModel(GL_SMOOTH)
 
     glMatrixMode(GL_PROJECTION)
@@ -63,6 +65,7 @@ class OpenGL2DSurface(Surface.SurfaceInterface):
         glutInitWindowPosition(0, 0)
         self.window = glutCreateWindow(b"Genesis")
         #glutDisplayFunc(memberfunctor(self, OpenGL2DSurface.DrawGLScene))
+        #glutDisplayFunc(foo)
         glutFullScreen()
         #glutIdleFunc(memberfunctor(self, OpenGL2DSurface.DrawGLScene))
         glutReshapeFunc(memberfunctor(self,OpenGL2DSurface.ReSizeGLScene))
@@ -83,7 +86,8 @@ class OpenGL2DSurface(Surface.SurfaceInterface):
         glLoadIdentity()
 
         nc=1
-        glTranslatef(self.shift.x,self.shift.y,-self.dist)
+        glScale(64/self.dist,64/self.dist,1)
+        glTranslatef(self.shift.x,self.shift.y,-64)
         p,s,c,t=self.updater()
         for i in range(0,len(p)):
             glTranslatef(p[i][0], p[i][1], 0)
@@ -98,7 +102,7 @@ class OpenGL2DSurface(Surface.SurfaceInterface):
                 glWindowPos2i(0,self.Height-18*nc)
                 glutBitmapString(OpenGL.GLUT.GLUT_BITMAP_HELVETICA_18,bytes(t[i],'utf-8'))
             glTranslatef(-p[i][0], -p[i][1], 0)
-        glTranslatef(-self.shift.x,-self.shift.y,self.dist)
+        glTranslatef(-self.shift.x,-self.shift.y,64)
 
         glColor3f(1,1,1)
         glWindowPos2i(0,self.Height-18)
