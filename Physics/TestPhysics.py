@@ -106,8 +106,10 @@ class TestBasics(unittest.TestCase):
 
 
 class TestPhysics(unittest.TestCase):
+    class mockrandom:
+        pass
     def test_CreateWorld(self):
-        w=World()
+        w=World(TestPhysics.mockrandom())
         w.Objects.append(Sphere())
         w.Creatures.append(Creature())
 
