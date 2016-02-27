@@ -70,6 +70,8 @@ GenerationCount=10#0
 CreatureCount=8
 ObstacleCount=6
 
+ProcessCount=mp.cpu_count()
+
 def SimulateOneGeneration(world, creature):
     for t in range(0, Secs * 20):
         world.Activate()
@@ -105,54 +107,55 @@ if __name__ == "__main__":
     print("\tGenerationCount = %d" % GenerationCount)
     print("\tCreatureCount = %d" % CreatureCount)
     print("\tObstacleCount = %d" % ObstacleCount)
-    
-    for g in range(0, GenerationCount):
-        print()
-        print("Generation #%d started" % (g))
-        
-        # Iterative solution
-        #iterativeGeneration = it.starmap(SimulateOneGeneration, generation)
-        #generation = list(iterativeGeneration)
-        
-        # Multpiprocess solution
+    print("\tProcessCount = %d" % ProcessCount)    
 
-        # Default method is 'fork' on linux, 'spawn' on windows
-        # mp.set_start_method('spawn')
-        with mp.Pool() as processPool:
-            manager = mp.Manager()
-            results = manager.dict()
+    with mp.Pool(ProcessCount) as processPool:
+        for g in range(0, GenerationCount):
+            print()
+            print("Generation #%d started" % (g))
+            
+            # Iterative solution
+            # iterativeGeneration = it.starmap(SimulateOneGeneration, generation)
+            # generation = list(iterativeGeneration)
+            
+            # Multpiprocess solution
 
-            params = [(MultiProcessingParamsForCreature (c.ID, c.Random, c.Color, c.Brain), results) for w, c in generation]
-            processPool.starmap(SimulateWrapperForMultiProcessing, params)
-            # print(results)
-            for _, creature in generation:
-                creature.Fittness = results[creature.ID]
+            # Default method is 'fork' on linux, 'spawn' on windows
+            # mp.set_start_method('spawn')
+            with mp.Manager() as manager:
+                results = manager.dict()
 
-        print("Generation #%d ended" % g)
+                params = [(MultiProcessingParamsForCreature (c.ID, c.Random, c.Color, c.Brain), results) for w, c in generation]
+                processPool.starmap(SimulateWrapperForMultiProcessing, params)
+                # print(results)
+                for _, creature in generation:
+                    creature.Fittness = results[creature.ID]
 
-        for i, (_, creature) in enumerate(generation):
-            survived = creature.Fittness > Secs
-            print("\t%d fittness = %f\t\t(Creature #%d\t%s)" % (i, creature.Fittness, creature.ID, "survived" if survived else "dead"))
+            print("Generation #%d ended" % g)
 
-        # create the next generation
-        print("Creating next generation")
-        nextgen = [Physics.Creature() for i in range(0, CreatureCount)]
-        for nextCreature in nextgen:
-            parentFittnesses = [c.Fittness for w, c in generation]
-            p1index, p2index = SelectParents (parentFittnesses)
-            p1 = generation[p1index][1]
-            p2 = generation[p2index][1]
-            CrossoverBrains(nextCreature, [p1, p2])
+            for i, (_, creature) in enumerate(generation):
+                survived = creature.Fittness > Secs
+                print("\t%d fittness = %f\t\t(Creature #%d\t%s)" % (i, creature.Fittness, creature.ID, "survived" if survived else "dead"))
 
-            print("\t%d x %d\t\t(Creature #%d x Creature #%d -> Creature #%d)" %
-                (p1index, p2index, p1.ID, p2.ID, nextCreature.ID))
+            # create the next generation
+            print("Creating next generation")
+            nextgen = [Physics.Creature() for i in range(0, CreatureCount)]
+            for nextCreature in nextgen:
+                parentFittnesses = [c.Fittness for w, c in generation]
+                p1index, p2index = SelectParents (parentFittnesses)
+                p1 = generation[p1index][1]
+                p2 = generation[p2index][1]
+                CrossoverBrains(nextCreature, [p1, p2])
 
-        
-        generation = list(map(CreateUniverse, nextgen))
+                print("\t%d x %d\t\t(Creature #%d x Creature #%d -> Creature #%d)" %
+                    (p1index, p2index, p1.ID, p2.ID, nextCreature.ID))
 
-    #s=Graphics.Surface2D.OpenGL.OpenGL2DSurface(Physics.memberfunctor(theWorld, Physics.World.GetRenderData))
-    #s=Graphics.Surface2D.MatPlotLib.MatplotLibSurface(Physics.memberfunctor(theWorld,Physics.World.GetRenderData))
-    # should be on other thread, or the physics must be on the render call
-    #s.StartRender()
+            
+            generation = list(map(CreateUniverse, nextgen))
+
+        #s=Graphics.Surface2D.OpenGL.OpenGL2DSurface(Physics.memberfunctor(theWorld, Physics.World.GetRenderData))
+        #s=Graphics.Surface2D.MatPlotLib.MatplotLibSurface(Physics.memberfunctor(theWorld,Physics.World.GetRenderData))
+        # should be on other thread, or the physics must be on the render call
+        #s.StartRender()
 
     print("Genesis ended")
