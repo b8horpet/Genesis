@@ -1,4 +1,4 @@
-#uthor: b8horpet
+#author: b8horpet
 
 import unittest
 

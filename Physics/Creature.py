@@ -7,6 +7,9 @@ from NeuralNet import *
 import numpy as np
 
 
+class wtf:
+    pass
+
 class Creature(Sphere): # one cell, spheric (for now)
     class Interact(Sphere.PhysEffect):
         def __init__(self, ph):
@@ -133,6 +136,7 @@ class Creature(Sphere): # one cell, spheric (for now)
             self.ID = mpParameters.id
             self.Random = mpParameters.random
             self.Color = mpParameters.color
+            self.par=mpParameters # fuck this
 
             # ez mar nagyon gany kezd lenni...
             for i,hl in enumerate(self.Brain.HiddenLayers):
@@ -142,6 +146,9 @@ class Creature(Sphere): # one cell, spheric (for now)
             for j,hn in enumerate(self.Brain.OutputLayer.Neurons):
                 for k,s in enumerate(hn.Inputs):
                     s.Weight=mpParameters.brain.OutputLayer.Neurons[j].Inputs[k].Weight
+        else:
+            self.par=wtf()
+            self.par.ws=0 # fuckfuckfuck
 
 
     def SetupBrain(self):
