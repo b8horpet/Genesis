@@ -21,6 +21,9 @@ Besides learning, this project has some ambitious goals:
   - The creature has random chance to get special predefined mutations (like eye, proximity sensor ...)
 - Rendering the world in real time in 3D
 
+###Side Projects
+There are sandbox python sources that only depend on a few module. They implement a smaller task and I use them to fiddle with other techniques as well. Examples: image recognition based on NeuralNet, OpenGL shaders based on Graphics, simple jenga game based on Physics. They are separate main programs and can be run without invoking genesis.
+
 ##Getting Started
 ###Requirements
 
@@ -34,6 +37,7 @@ Besides learning, this project has some ambitious goals:
     - pyopengl
   - **planned:**
     - pybrain
+    - theano
 - I use PyCharm IDE
 
 ###Development
