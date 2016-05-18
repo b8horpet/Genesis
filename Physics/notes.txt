@@ -7,6 +7,7 @@ Improving numerical precision:
 - ???
 Improving performance:
 - real space partitioning (k-d trees?)
+- sort and sweep can be from O(nlogn) to O(n)
 - using threads (real multicore threading)
 - using OpenCL/CUDA
 Problems:
