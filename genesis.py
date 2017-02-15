@@ -1,8 +1,13 @@
 __author__ = 'b8horpet'
 
-import Simulation
 
-s=Simulation.Simulation()
-s.RunSimulations()
+def Main():
+    import Simulation
+
+    s=Simulation.Simulation()
+    s.RunSimulations()
+
+if __name__ == "__main__":
+    Main()
 
 print("Genesis ended")
