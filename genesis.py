@@ -73,6 +73,8 @@ if __name__ == "__main__":
     for g in range(0, GenerationCount):
         print("Generation #%d started" % (g))
         for world, creature in generation:
+            s=Graphics.Surface2D.OpenGL.OpenGL2DSurface(Physics.memberfunctor(world, Physics.World.GetRenderData))
+            s.StartRender()
             for t in range(0,Secs * 20):
                 world.Activate()
 
@@ -80,11 +82,11 @@ if __name__ == "__main__":
                     print ("\tCreature #%d died" % creature.ID)
                     creature.Fittness = t / 20
                     break
-            
+
             if creature.IsAlive():
                 print ("\tCreature #%d has survived" % creature.ID)
                 creature.Fittness=Secs+(creature.Health+1)*(creature.Energy+1)
-        
+
         print("Generation #%d ended" % g)
 
         for _, creature in generation:
@@ -102,7 +104,7 @@ if __name__ == "__main__":
 
             print("\t(Creature #%d, Creature #%d) -> Creature #%d" % (p1.ID, p2.ID, nextCreature.ID))
 
-        
+
         generation = list(map(CreateUniverse, nextgen))
 
     #s=Graphics.Surface2D.OpenGL.OpenGL2DSurface(Physics.memberfunctor(theWorld, Physics.World.GetRenderData))

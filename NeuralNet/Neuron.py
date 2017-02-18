@@ -55,6 +55,12 @@ class OutputNeuron(Neuron):
     pass
 
 
+class RecurrentNeuron(HiddenNeuron):
+    def __init__(self):
+        super(RecurrentNeuron,self).__init__()
+        Synapsis(self,self)
+
+
 class ConstantNeuron(NeuralObjectInterface):
     def __init__(self):
         self.Output=1.0
