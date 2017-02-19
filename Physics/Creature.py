@@ -114,8 +114,8 @@ class Creature(Sphere): # one cell, spheric (for now)
 
 
 
-    def __init__(self):
-        super(Creature,self).__init__()
+    def __init__(self, p=Vector3D()):
+        super(Creature,self).__init__(p)
 
         # seed or random may have to come from outside later
         self.Random = np.random.RandomState(seed=self.ID)
@@ -241,10 +241,11 @@ class Food(Sphere):
         return e
 
 class Obstacle(Sphere):
-    def __init__(self):
-        super(Obstacle,self).__init__()
+    def __init__(self,p=Vector3D):
+        super(Obstacle,self).__init__(p)
         self.Damage=10.0
-        self.Radius=3.0
+        #self.Radius=3.0
+        self.Radius = 2.0
         self.Mass=10.0
         self.Color=(0.2,0.2,0.2,1)
 

@@ -45,11 +45,11 @@ class Sphere(Object):
             self.dM=m
             self.dR=r
 
-    def __init__(self):
+    def __init__(self, p=Vector3D()):
         super(Sphere,self).__init__()
         self.Mass = 1.0
         self.Radius = 0.5
-        self.Pos=Vector3D() # must be inside of the Object
+        self.Pos=Vector3D(p.x,p.y,p.z) # must be inside of the Object
         self.Vel=Vector3D()
         self.Acc=Vector3D()
         self.Frics=0.0,0.0 # first is linear second is quadratic (like in water)

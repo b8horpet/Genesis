@@ -98,7 +98,7 @@ class World:
         self.Random = random
         self.Objects = []
         self.Creatures = []
-        self.ObjLimit=50
+        self.ObjLimit=200
         self.Size=25.0
         self.TickCnt=0
         self.Geometry = World.Geometry()
@@ -153,6 +153,9 @@ class World:
 
 
     def Activate(self):
+        if PROFILE:
+            pr = cProfile.Profile()
+            pr.enable()
         for i in range(0,5):
             self.TickCnt+=1
             self.TickCnt%=5
@@ -161,6 +164,11 @@ class World:
             self.Physics(0.01)
             if self.TickCnt == 0:
                 self.Logic()
+        if PROFILE:
+            pr.disable()
+            sortby = 'cumulative'
+            ps = pstats.Stats(pr).sort_stats(sortby)
+            ps.print_stats()
 
     def Dump(self):
         l=[]
@@ -169,16 +177,8 @@ class World:
         return pickle.dumps(l)
 
     def GetRenderData(self):
-        if PROFILE:
-            pr = cProfile.Profile()
-            pr.enable()
         self.Activate()
             #cProfile.run('theWorld.Activate()')
-        if PROFILE:
-            pr.disable()
-            sortby = 'cumulative'
-            ps = pstats.Stats(pr).sort_stats(sortby)
-            ps.print_stats()
 
         pos = []
         siz = []

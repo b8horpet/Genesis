@@ -3,7 +3,7 @@
 
 import numpy as np
 DEBUG=False
-PROFILE=False
+PROFILE=True
 
 
 def memberfunctor(this, func):
@@ -65,6 +65,9 @@ class Vector2D:
 
     def __mod__(self, other):
         raise NotImplementedError()
+
+    def __repr__(self):
+        return "(%f, %f)" % (self.x,self.y)
 
     def Normalize(self):
         l=abs(self)
@@ -131,6 +134,9 @@ class Vector3D(Vector2D):
             self.z*other.x-self.x*other.z,
             self.x*other.y-self.y*other.x
         )
+
+    def __repr__(self):
+        return "(%f, %f, %f)" % (self.x,self.y,self.z)
 
     def Normalize(self):
         l=abs(self)
