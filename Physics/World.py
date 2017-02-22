@@ -8,6 +8,7 @@ from Physics.Object import *
 from Physics.Creature import *
 import cProfile, pstats
 import pickle
+from functools import partial
 
 
 def ConstantFrics(p: Vector3D) -> float:
@@ -49,7 +50,11 @@ class World:
                 self.Tiles[(tx,ty)]=World.Tile(tx,ty)
             return self.Tiles[(tx,ty)]
 
-        def BuildTiles(self, os):
+        def DoCollisions(self, os):
+            self.BroadPhase(os)
+            self.NarrowPhase()
+
+        def BroadPhase(self, os):
             self.Tiles={} # sry gc
             for o in os:
                 t=self.GetTile(o.Pos.x,o.Pos.y)
@@ -75,7 +80,7 @@ class World:
                         cy=corner.y+additional['y']*2-1
                         self.GetTile(cx,cy).AddObject(o)
 
-        def DoCollisions(self):
+        def NarrowPhase(self):
             colls=set()
             for p in self.Tiles:
                 colls.update(self.Tiles[p].Collide())
@@ -88,6 +93,78 @@ class World:
                 o.DoEffect(pc)
                 p.DoEffect(oc)
 
+    class Geometry_RDC:
+        def __init__(self):
+            self.UpdateFrics=ConstantFrics
+            self.TileSize=5
+            self.Clusters=[]
+
+        def DoCollisions(self, os):
+            self.BroadPhase(os)
+            self.NarrowPhase()
+
+        def get_pos_by_dim(d, v):
+            return getattr(v.GetBoundingBox()[0],d)
+
+        def BroadPhase(self, os):
+            self.Clusters=[]
+            #could be done on separate threads
+            dimensions=['x','y'] # only 2 dimension
+            #this is fragile, should be indexed with numbers
+            dirtyClusters=[[os,[True for d in dimensions]]]
+            dim=0
+            while dirtyClusters:
+                dc=dimensions[dim]
+                #print("pass %s %d" % (dc,len(dirtyClusters)))
+                for i in reversed(range(len(dirtyClusters))):
+                    c=dirtyClusters.pop(i)
+                    if True not in c[1]:
+                        self.Clusters.append(c[0])
+                        continue
+                    if not c[0]:
+                        c[1][dim]=False
+                        continue
+                    c[0].sort(key=partial(World.Geometry_RDC.get_pos_by_dim,dc))
+                    clusterBoundaries=[]
+                    maxD=getattr(c[0][0].GetBoundingBox()[0],dc)
+                    for j,o in enumerate(c[0]):
+                        bb=o.GetBoundingBox()
+                        od_r=getattr(bb[1],dc)
+                        od_l=getattr(bb[0],dc)
+                        if od_l > maxD:
+                            clusterBoundaries.append(j)
+                            maxD=od_r
+                        elif od_r > maxD:
+                            maxD=od_r
+                    if not clusterBoundaries:
+                        c[1][dim]=False
+                        dirtyClusters.append(c)
+                    else:
+                        clusterBoundaries.append(len(c[0]))
+                        lastbound=0
+                        for j in clusterBoundaries:
+                            dirtyClusters.append([c[0][lastbound:j],[x!=dim for x in range(len(dimensions))]])
+                            lastbound=j
+                dim+=1
+                dim%=len(dimensions)
+
+        def NarrowPhase(self):
+            for c in self.Clusters:
+                for i in range(len(c)-1):
+                    o1=c[i]
+                    for j in range(i+1,len(c)):
+                        o2=c[j]
+                        colls=[]
+                        if o1.Collide(o2) == True:
+                            colls.append((o1,o2))
+                        colleffs=[]
+                        for o,p in colls:
+                            oc=o.DoCollision(p)
+                            pc=p.DoCollision(o)
+                            colleffs.append(((o,oc),(p,pc)))
+                        for (o,oc),(p,pc) in colleffs:
+                            o.DoEffect(pc)
+                            p.DoEffect(oc)
 
 
     def __init__(self, random):
@@ -98,10 +175,11 @@ class World:
         self.Random = random
         self.Objects = []
         self.Creatures = []
-        self.ObjLimit=200
+        self.ObjLimit=1000
         self.Size=25.0
         self.TickCnt=0
         self.Geometry = World.Geometry()
+        #self.Geometry = World.Geometry_RDC()
         if DEBUG:
             self.tkp=None
             self.dtkp=None
@@ -131,8 +209,7 @@ class World:
             self.RemoveObject(d)
         self.Geometry.TileSize*=2.0
         self.Geometry.TileSize=int(np.round(self.Geometry.TileSize))+1
-        self.Geometry.BuildTiles(self.Objects)
-        self.Geometry.DoCollisions()
+        self.Geometry.DoCollisions(self.Objects)
 
     def Logic(self):
         for c in self.Creatures:

@@ -13,6 +13,8 @@ class Object:
             raise NotImplementedError()
 
     ID=0
+    NumColls=0
+    NumCollTests=0
 
     def __init__(self):
         Object.ID+=1
@@ -33,6 +35,12 @@ class Object:
     def DoCollision(self, other):
         """
         Handles the collision with the other object
+        """
+        raise NotImplementedError()
+
+    def GetBoundingBox(self):
+        """
+        Returns the topleft and bottomright corner of the bounding box
         """
         raise NotImplementedError()
 
@@ -87,6 +95,7 @@ class Sphere(Object):
         self.Acc=Vector3D(0.0,0.0,0.0)
 
     def Collide(self, other):
+        Object.NumCollTests+=1
         rad_sum=self.Radius+other.Radius
         pos_diff=self.Pos-other.Pos
         if abs(pos_diff.x) > rad_sum or abs(pos_diff.y) > rad_sum:
@@ -94,6 +103,7 @@ class Sphere(Object):
         return pos_diff*pos_diff < rad_sum**2
 
     def DoCollision(self, other):
+        Object.NumColls+=1
         #todo WTF
         d=self.Pos-other.Pos
         d/=abs(d)
@@ -120,3 +130,6 @@ class Sphere(Object):
         self.Acc+=e.dA
         self.Mass+=e.dM
         self.Radius+=e.dR
+
+    def GetBoundingBox(self):
+        return self.Pos-Vector3D(self.Radius,self.Radius,self.Radius), self.Pos+Vector3D(self.Radius,self.Radius,self.Radius)

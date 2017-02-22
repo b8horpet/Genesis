@@ -3,7 +3,7 @@
 
 import numpy as np
 DEBUG=False
-PROFILE=True
+PROFILE=False
 
 
 def memberfunctor(this, func):

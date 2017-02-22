@@ -64,7 +64,7 @@ class OpenGL2DSurface(Surface.SurfaceInterface):
         glutInitWindowSize(self.Width, self.Height)
         glutInitWindowPosition(0, 0)
         self.window = glutCreateWindow(b"Genesis")
-        #glutDisplayFunc(memberfunctor(self, OpenGL2DSurface.DrawGLScene))
+        glutDisplayFunc(memberfunctor(self, OpenGL2DSurface.ClearColor))
         #glutDisplayFunc(foo)
         glutFullScreen()
         #glutIdleFunc(memberfunctor(self, OpenGL2DSurface.DrawGLScene))
@@ -75,6 +75,10 @@ class OpenGL2DSurface(Surface.SurfaceInterface):
     def StartRender(self):
         glutTimerFunc(self.TimeMS,memberfunctor(self, OpenGL2DSurface.DrawGLScene),0)
         glutMainLoop()
+
+    def ClearColor(self, *args, **kwargs):
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        glutSwapBuffers()
 
     def DrawGLScene(self, *args, **kwargs):
         glutTimerFunc(self.TimeMS,memberfunctor(self, OpenGL2DSurface.DrawGLScene),0)

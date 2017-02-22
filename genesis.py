@@ -51,8 +51,9 @@ def CreateUniverse(creature):
     world=Physics.World(worldRandom)
     for o in range(0, ObstacleCount):
         alpha=np.pi * 2.0 * o / ObstacleCount
-        dist=worldRandom.uniform(5,20)
-        obs=Physics.Obstacle(Physics.Vector3D(np.cos(alpha)*dist,np.sin(alpha)*dist,0))
+        #dist=worldRandom.uniform(5,20)
+        #obs=Physics.Obstacle(Physics.Vector3D(np.cos(alpha)*dist,np.sin(alpha)*dist,0))
+        obs=Physics.Obstacle(Physics.Vector3D(worldRandom.uniform(-30,30),worldRandom.uniform(-30,30),0))
         world.AddObject(obs)
     
     world.AddObject(creature)
@@ -61,7 +62,7 @@ def CreateUniverse(creature):
 
 if __name__ == "__main__":
     CreatureCount=1
-    ObstacleCount=150
+    ObstacleCount=50
     Secs=50
 
     initialCreatures = [Physics.Creature() for i in range(0, CreatureCount)]
@@ -70,6 +71,10 @@ if __name__ == "__main__":
     print("generating universe")
     world,_ = CreateUniverse(initialCreatures[0])
     print("stepping")
+    for asd in range(100):
+        print("step %d" % asd)
+        world.Activate()
+    print("collision tests: %d collisions: %d" % (Physics.Object.NumCollTests,Physics.Object.NumColls))
 #    for t in range(0,Secs * 20):
 #        print("step %d" % t )
 #        world.Activate()
@@ -77,9 +82,9 @@ if __name__ == "__main__":
 #            print ("\tNo more creatures alive")
 #            break
 
-    s=Graphics.Surface2D.OpenGL.OpenGL2DSurface(Physics.memberfunctor(world, Physics.World.GetRenderData))
+    #s=Graphics.Surface2D.OpenGL.OpenGL2DSurface(Physics.memberfunctor(world, Physics.World.GetRenderData))
     #s=Graphics.Surface2D.MatPlotLib.MatplotLibSurface(Physics.memberfunctor(world,Physics.World.GetRenderData))
     # should be on other thread, or the physics must be on the render call
-    s.StartRender()
+    #s.StartRender()
 
     print("Genesis ended")
