@@ -70,11 +70,11 @@ if __name__ == "__main__":
 
     print("generating universe")
     world,_ = CreateUniverse(initialCreatures[0])
-    print("stepping")
-    for asd in range(100):
-        print("step %d" % asd)
-        world.Activate()
-    print("collision tests: %d collisions: %d" % (Physics.Object.NumCollTests,Physics.Object.NumColls))
+#    print("stepping")
+#    for asd in range(100):
+#        print("step %d" % asd)
+#        world.Activate()
+#    print("collision tests: %d collisions: %d" % (Physics.Object.NumCollTests,Physics.Object.NumColls))
 #    for t in range(0,Secs * 20):
 #        print("step %d" % t )
 #        world.Activate()
@@ -83,8 +83,8 @@ if __name__ == "__main__":
 #            break
 
     #s=Graphics.Surface2D.OpenGL.OpenGL2DSurface(Physics.memberfunctor(world, Physics.World.GetRenderData))
-    #s=Graphics.Surface2D.MatPlotLib.MatplotLibSurface(Physics.memberfunctor(world,Physics.World.GetRenderData))
+    s=Graphics.Surface2D.MatPlotLib.MatplotLibSurface(Physics.memberfunctor(world,Physics.World.GetRenderData),Physics.memberfunctor(world.Geometry,Physics.World.Geometry_RDC.GetDebugData))
     # should be on other thread, or the physics must be on the render call
-    #s.StartRender()
+    s.StartRender()
 
     print("Genesis ended")

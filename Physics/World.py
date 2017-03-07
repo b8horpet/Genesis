@@ -16,6 +16,10 @@ def ConstantFrics(p: Vector3D) -> float:
 
 
 class World:
+    class IGeometry:
+        def GetDebugData(self):
+            pass
+
     class Tile:
         def __init__(self, x: int, y: int):
             self.x=x
@@ -37,7 +41,7 @@ class World:
                         colls.add((self.Objects[i],self.Objects[j]))
             return colls
 
-    class Geometry:
+    class Geometry(IGeometry):
         def __init__(self):
             self.UpdateFrics=ConstantFrics
             self.TileSize=5
@@ -49,6 +53,9 @@ class World:
             if (tx,ty) not in self.Tiles:
                 self.Tiles[(tx,ty)]=World.Tile(tx,ty)
             return self.Tiles[(tx,ty)]
+
+        def GetDebugData(self):
+            return [(self.Tiles[t].x*self.TileSize,self.Tiles[t].y*self.TileSize,(self.Tiles[t].x+1)*self.TileSize,(self.Tiles[t].y+1)*self.TileSize) for t in self.Tiles]
 
         def DoCollisions(self, os):
             self.BroadPhase(os)
@@ -93,11 +100,15 @@ class World:
                 o.DoEffect(pc)
                 p.DoEffect(oc)
 
-    class Geometry_RDC:
+    class Geometry_RDC(IGeometry):
         def __init__(self):
             self.UpdateFrics=ConstantFrics
             self.TileSize=5
             self.Clusters=[]
+
+        def GetDebugData(self):
+            return [(c[1][0][0],c[1][1][0],c[1][0][1],c[1][1][1]) for c in self.Clusters]
+            #return [(self.Tiles[t].x*self.TileSize,self.Tiles[t].y*self.TileSize,(self.Tiles[t].x+1)*self.TileSize,(self.Tiles[t].y+1)*self.TileSize) for t in self.Tiles]
 
         def DoCollisions(self, os):
             self.BroadPhase(os)
@@ -111,7 +122,7 @@ class World:
             #could be done on separate threads
             dimensions=['x','y'] # only 2 dimension
             #this is fragile, should be indexed with numbers
-            dirtyClusters=[[os,[True for d in dimensions]]]
+            dirtyClusters=[[os,[True for d in dimensions],[(0,0) for d in dimensions]]]
             dim=0
             while dirtyClusters:
                 dc=dimensions[dim]
@@ -119,37 +130,40 @@ class World:
                 for i in reversed(range(len(dirtyClusters))):
                     c=dirtyClusters.pop(i)
                     if True not in c[1]:
-                        self.Clusters.append(c[0])
-                        continue
-                    if not c[0]:
-                        c[1][dim]=False
+                        self.Clusters.append((c[0],c[2]))
                         continue
                     c[0].sort(key=partial(World.Geometry_RDC.get_pos_by_dim,dc))
                     clusterBoundaries=[]
-                    maxD=getattr(c[0][0].GetBoundingBox()[0],dc)
+                    maxD=getattr(c[0][0].GetBoundingBox()[1],dc)
+                    minD=getattr(c[0][0].GetBoundingBox()[0],dc)
                     for j,o in enumerate(c[0]):
                         bb=o.GetBoundingBox()
                         od_r=getattr(bb[1],dc)
                         od_l=getattr(bb[0],dc)
                         if od_l > maxD:
-                            clusterBoundaries.append(j)
+                            clusterBoundaries.append((j,(minD,maxD)))
                             maxD=od_r
+                            minD=od_l
                         elif od_r > maxD:
                             maxD=od_r
                     if not clusterBoundaries:
                         c[1][dim]=False
+                        c[2][dim]=(minD,maxD)
                         dirtyClusters.append(c)
                     else:
-                        clusterBoundaries.append(len(c[0]))
+                        clusterBoundaries.append((len(c[0]),(minD,maxD)))
                         lastbound=0
                         for j in clusterBoundaries:
-                            dirtyClusters.append([c[0][lastbound:j],[x!=dim for x in range(len(dimensions))]])
-                            lastbound=j
+                            currCluster=[c[0][lastbound:j[0]],[x!=dim for x in range(len(dimensions))],[i for i in c[2]]]
+                            currCluster[2][dim]=j[1]
+                            dirtyClusters.append(currCluster)
+                            lastbound=j[0]
                 dim+=1
                 dim%=len(dimensions)
 
         def NarrowPhase(self):
-            for c in self.Clusters:
+            for cbb in self.Clusters:
+                c=cbb[0]
                 for i in range(len(c)-1):
                     o1=c[i]
                     for j in range(i+1,len(c)):
@@ -178,8 +192,8 @@ class World:
         self.ObjLimit=1000
         self.Size=25.0
         self.TickCnt=0
-        self.Geometry = World.Geometry()
-        #self.Geometry = World.Geometry_RDC()
+        #self.Geometry = World.Geometry()
+        self.Geometry = World.Geometry_RDC()
         if DEBUG:
             self.tkp=None
             self.dtkp=None

@@ -245,7 +245,7 @@ class Obstacle(Sphere):
         super(Obstacle,self).__init__(p)
         self.Damage=10.0
         #self.Radius=3.0
-        self.Radius = 2.0
+        self.Radius = 1.5
         self.Mass=10.0
         self.Color=(0.2,0.2,0.2,1)
 
